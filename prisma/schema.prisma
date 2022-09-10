@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Docente {
+    id          Int         @id @default(autoincrement())
+    cf          String      @unique
+    nome        String
+    cognome     String
+    email       String      @unique
+    solfeggio   Boolean     @default(false)
+    alunni      Alunno[]
+    admin       Boolean     @default(false)
+    password    String
+    lezioni     Lezione[]
+    oreDiLavoro Int         @default(0)
+}
+
+model Alunno {
+    id             Int     @id @default(autoincrement())
+    cf             String  @unique
+    nome           String
+    cognome        String
+    email          String
+    docente        Docente @relation(fields: [docenteId], references: [id])
+    docenteId      Int
+    annoCorso      Int
+    annoIscrizione String
+    lezioni        Lezione[]
+}
+
+model Lezione {
+    id             Int       @id @default(autoincrement())
+    docente        Docente   @relation(fields: [docenteId], references: [id])
+    docenteId      Int
+    alunno         Alunno    @relation(fields: [alunnoId], references: [id])
+    alunnoId       Int
+    orario         DateTime
+    libretto       Libretto?
+    note           String?
+}
+
+enum Libretto {
+  PRESENTE
+  ASSENTE_GIUSTIFICATO
+  ASSENTE_NON_GIUSTIFICATO
+  LEZIONE_SALTATA
+}

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `docente` ADD COLUMN `oreDiLavoro` INTEGER NOT NULL DEFAULT 0;
