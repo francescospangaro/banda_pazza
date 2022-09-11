@@ -88,19 +88,6 @@ const Home: NextPage<Props> = (props) => {
                         }
                     }) ?? []} />
                 </main>
-
-                <footer className={styles.footer}>
-                    <a
-                        href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        Corpo Musicale M. G. Nava – musica per passione dal 1920
-                        <span className={styles.logo}>
-                        <Image src="/logo.svg" alt="Logo" width={16} height={16} />
-                        </span>
-                    </a>
-                </footer>
             </Container>
         </Layout>
     );
