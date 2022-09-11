@@ -40,13 +40,11 @@ const Home: NextPage<Props> = (props) => {
                     from: (() => {
                         const startOfDay = new Date(currentDate);
                         startOfDay.setHours(0, 0, 0, 0);
-                        console.log(startOfDay);
                         return startOfDay;
                     })(),
                     to: (() => {
                         const endOfDay = new Date(currentDate);
                         endOfDay.setHours(23, 59, 59, 9999);
-                        console.log(endOfDay);
                         return endOfDay;
                     })(),
                 })
