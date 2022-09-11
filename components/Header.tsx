@@ -22,11 +22,11 @@ export default function Header() {
                             href="/api/logout.tsx"
                             onClick={async (e) => {
                                 e.preventDefault()
-                                await mutateUser(
-                                    await (await fetch('/api/logout', { method: 'POST' })).json(),
-                                     false
-                                 )
-                                 await router.push('/login')
+                                const user = await fetch('/api/logout', { method: 'POST' }).then(res => res.json());
+                                await Promise.all([
+                                    mutateUser(user, false),
+                                    router.push('/login'),
+                                ])
                             }}
                         >
                             Logout

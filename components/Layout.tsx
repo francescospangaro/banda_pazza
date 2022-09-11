@@ -5,9 +5,12 @@ import Image from "next/image";
 import React from "react";
 import {Spinner} from "react-bootstrap"
 
-export default function Layout({ children, loading }: { children: React.ReactNode, loading?: boolean }) {
-    const { user } = useUser({ redirectTo: '/login' })
-    if(!user) return <div></div>
+export default function Layout({ children, requiresAuth, loading }: {
+    children: React.ReactNode,
+    requiresAuth?: boolean,
+    loading?: boolean,
+}) {
+    const { user, isValidatingUser } = useUser(requiresAuth ? { redirectTo: '/login' } : {})
 
     return (
         <>
@@ -39,13 +42,13 @@ export default function Layout({ children, loading }: { children: React.ReactNod
           flex-flow: column;
         }
       `}</style>
-            {user?.isLoggedIn === true && (
+            {requiresAuth && user?.isLoggedIn === true && (
                 <Header />
             )}
 
             <div className="container">
                 <main>
-                    {children}
+                    {(!requiresAuth || !isValidatingUser || user?.isLoggedIn === true) && children}
                 </main>
 
                 <footer>
@@ -62,7 +65,7 @@ export default function Layout({ children, loading }: { children: React.ReactNod
                 </footer>
             </div>
 
-            {loading && (
+            {isValidatingUser || loading && (
                 <div className="loading-spinner">
                     <Spinner animation="grow" role="status" variant="primary">
                         <span className="visually-hidden">Loading...</span>

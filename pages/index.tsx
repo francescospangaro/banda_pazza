@@ -57,7 +57,7 @@ const Home: NextPage<Props> = (props) => {
         });
 
     return (
-        <Layout loading={!lezioni}>
+        <Layout requiresAuth loading={!lezioni}>
             <Container fluid className={styles.container}>
                 <main className={styles.main}>
                     <Row className="gap-3 mb-3 align-items-center">

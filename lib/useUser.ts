@@ -8,12 +8,13 @@ export default function useUser({
                                     redirectIfFound = false,
                                 } = {}) {
     const fetcher = (url: string) => fetch(url).then(r => r.json());
-    const {data: user, mutate: mutateUser} = useSWR<User>('/api/user', fetcher);
+    const swrResponse = useSWR<User>('/api/user', fetcher);
+    const user = swrResponse.data
 
     useEffect(() => {
         // if no redirect needed, just return (example: already on /dashboard)
         // if user data not yet there (fetch in progress, logged in or not) then don't do anything yet
-        if (!redirectTo) return
+        if (!redirectTo || swrResponse.isValidating) return
 
         if (
             // If redirectTo is set, redirect if the user was not found.
@@ -25,5 +26,9 @@ export default function useUser({
         }
     }, [user, redirectIfFound, redirectTo])
 
-    return {user, mutateUser}
+    return {
+        user: user,
+        mutateUser: swrResponse.mutate,
+        isValidatingUser: swrResponse.isValidating,
+    }
 }

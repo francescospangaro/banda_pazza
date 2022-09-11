@@ -2,11 +2,14 @@ import React, { useState } from 'react'
 import useUser from '../lib/useUser'
 import Layout from '../components/Layout'
 import LoginForm from '../components/LoginForm'
+import {useRouter} from "next/router";
 
 export default function Login() {
     // here we just check if user is already logged in and redirect to profile
+    const redirectUrl = '/'
+    const router = useRouter()
     const { mutateUser } = useUser({
-        redirectTo: '/',
+        redirectTo: redirectUrl,
         redirectIfFound: true,
     })
 
@@ -32,12 +35,17 @@ export default function Login() {
                                 body: JSON.stringify(body),
                             })
 
-                            if(res.ok)
-                                mutateUser(await res.json(), false)
-                            else if(res.status == 401)
+                            if(res.ok) {
+                                const user = await res.json();
+                                await Promise.all([
+                                    router.push('/login'),
+                                    mutateUser(user, false),
+                                ]);
+                            } else if(res.status == 401) {
                                 setErrorMsg("Credenziali errate!")
-                            else
+                            } else {
                                 setErrorMsg("Unexpected error")
+                            }
                         }}
                     />
                 </div>
