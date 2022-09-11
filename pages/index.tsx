@@ -64,9 +64,6 @@ const Home: NextPage<Props> = (props) => {
                         <Col xs="12" md="auto">
                             <DatePicker className="w-100" selected={currentDate} onChange={(target: Date) => {setCurrentDate(target)}} />
                         </Col>
-                        <Col xs="12" md="auto">
-                            <Button variant="secondary" size="sm" className="w-100">Aggiungi</Button>
-                        </Col>
                     </Row>
                     <Row className="align-items-center">
                         <div className="alert alert-danger" role="alert">
