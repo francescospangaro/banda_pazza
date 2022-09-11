@@ -5,9 +5,11 @@ import { FormEvent } from 'react'
 export default function LoginForm({
                                  errorMessage,
                                  onSubmit,
+                                 isLoggingIn,
                              }: {
     errorMessage: string
     onSubmit: (e: FormEvent<HTMLFormElement>) => void
+    isLoggingIn: boolean
 }) {
     return (
         <Form onSubmit={onSubmit}>
@@ -24,7 +26,7 @@ export default function LoginForm({
             </Form.Group>
 
             <Form.Group controlId="formSubmit" className="mb-3">
-                <Button type="submit" className="w-100">Login</Button>
+                <Button disabled={isLoggingIn} type="submit" className="w-100">Login</Button>
                 {errorMessage && (
                     <Form.Text muted className="error w-100">{errorMessage}</Form.Text>
                 )}

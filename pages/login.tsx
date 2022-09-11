@@ -14,37 +14,42 @@ export default function Login() {
     })
 
     const [errorMsg, setErrorMsg] = useState('')
+    const [isLoggingIn, setIsLoggingIn] = useState(false)
 
     return (
-        <Layout>
+        <Layout loading={isLoggingIn}>
             <div className="login">
                 <div className="login-box">
                     <LoginForm
                         errorMessage={errorMsg}
+                        isLoggingIn={isLoggingIn}
                         onSubmit={async function handleSubmit(event) {
                             event.preventDefault()
-                            setErrorMsg("")
 
-                            const body = {
-                                email: event.currentTarget.username.value,
-                                password: event.currentTarget.password.value,
-                            }
+                            setErrorMsg("")
+                            setIsLoggingIn(true)
+
                             const res = await fetch('/api/login', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify(body),
-                            })
+                                body: JSON.stringify({
+                                    email: event.currentTarget.username.value,
+                                    password: event.currentTarget.password.value,
+                                }),
+                            });
 
                             if(res.ok) {
-                                const user = await res.json();
+                                const user = res.json();
                                 await Promise.all([
                                     router.push('/login'),
                                     mutateUser(user, false),
                                 ]);
                             } else if(res.status == 401) {
-                                setErrorMsg("Credenziali errate!")
+                                setErrorMsg("Credenziali errate!");
+                                setIsLoggingIn(false);
                             } else {
-                                setErrorMsg("Unexpected error")
+                                setErrorMsg("Unexpected error");
+                                setIsLoggingIn(false);
                             }
                         }}
                     />
