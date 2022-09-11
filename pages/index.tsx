@@ -70,6 +70,14 @@ const Home: NextPage<Props> = (props) => {
                             <Button variant="secondary" size="sm" className="w-100">Aggiungi</Button>
                         </Col>
                     </Row>
+                    <Row className="align-items-center">
+                        <div className="alert alert-danger" role="alert">
+                            Hai lezioni da recuperare!
+                        </div>
+                        <div className="alert alert-success" role="alert">
+                            Nessuna lezione da recuperare!
+                        </div>
+                    </Row>
                     <LezioniTable content={lezioni?.map(lezione => {
                         return {
                             nome: lezione.alunno.nome,

@@ -7,6 +7,7 @@ export type User = {
     id: number
     admin: boolean
     isLoggedIn: boolean
+    oreRecuperare: number
 }
 
 async function userRoute(req: NextApiRequest, res: NextApiResponse<User>) {
@@ -20,7 +21,8 @@ async function userRoute(req: NextApiRequest, res: NextApiResponse<User>) {
             isLoggedIn: false,
             email: '',
             id: 0,
-            admin: false
+            admin: false,
+            oreRecuperare: 0
         })
     }
 }
