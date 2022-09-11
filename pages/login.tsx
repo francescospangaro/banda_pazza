@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import useUser from '../lib/useUser'
 import Layout from '../components/Layout'
-import Form from '../components/Form'
+import LoginForm from '../components/LoginForm'
 
 export default function Login() {
     // here we just check if user is already logged in and redirect to profile
@@ -15,7 +15,7 @@ export default function Login() {
     return (
         <Layout>
             <div className="login">
-                <Form
+                <LoginForm
                     errorMessage={errorMsg}
                     onSubmit={async function handleSubmit(event) {
                         event.preventDefault()
