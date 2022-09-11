@@ -15,35 +15,44 @@ export default function Login() {
     return (
         <Layout>
             <div className="login">
-                <LoginForm
-                    errorMessage={errorMsg}
-                    onSubmit={async function handleSubmit(event) {
-                        event.preventDefault()
-                        setErrorMsg("")
+                <div className="login-box">
+                    <LoginForm
+                        errorMessage={errorMsg}
+                        onSubmit={async function handleSubmit(event) {
+                            event.preventDefault()
+                            setErrorMsg("")
 
-                        const body = {
-                            email: event.currentTarget.username.value,
-                            password: event.currentTarget.password.value,
-                        }
-                        const res = await fetch('/api/login', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(body),
-                        })
+                            const body = {
+                                email: event.currentTarget.username.value,
+                                password: event.currentTarget.password.value,
+                            }
+                            const res = await fetch('/api/login', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(body),
+                            })
 
-                        if(res.ok)
-                            mutateUser(await res.json(), false)
-                        else if(res.status == 401)
-                            setErrorMsg("Credenziali errate!")
-                        else
-                            setErrorMsg("Unexpected error")
-                    }}
-                />
+                            if(res.ok)
+                                mutateUser(await res.json(), false)
+                            else if(res.status == 401)
+                                setErrorMsg("Credenziali errate!")
+                            else
+                                setErrorMsg("Unexpected error")
+                        }}
+                    />
+                </div>
             </div>
             <style jsx>{`
         .login {
+          flex: 1 1 auto;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        }
+        
+        .login-box {
           max-width: 21rem;
-          margin: 0 auto;
+          margin: auto;
           padding: 1rem;
           border: 1px solid #ccc;
           border-radius: 4px;

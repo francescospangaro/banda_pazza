@@ -21,7 +21,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           box-sizing: border-box;
         }
         html, body {
-          min-height: 100vh;
           margin: 0;
         }
         body {
@@ -30,13 +29,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
             'Helvetica Neue', Arial, Noto Sans, sans-serif, 'Apple Color Emoji',
             'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-          min-height: 100vh;
         }
-        .container {
-          max-width: 65rem;
-          margin: 1.5rem auto;
-          padding-left: 1rem;
-          padding-right: 1rem;
+        #__next {
+          min-height: 100vh;
+          display: flex;
+          flex-flow: column;
         }
       `}</style>
             {user?.isLoggedIn === true && (
@@ -44,8 +41,20 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             )}
 
             <main>
-                <div className="container">{children}</div>
+                {children}
             </main>
+            <style jsx>{`
+        main {
+          flex: 1 1 auto;
+          height: 100%;
+          max-width: 65rem;
+          margin: 1.5rem auto;
+          padding-left: 1rem;
+          padding-right: 1rem;
+          display: flex;
+          flex-flow: column;
+        }
+            `}</style>
         </>
     )
 }
