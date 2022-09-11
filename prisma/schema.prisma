@@ -11,17 +11,18 @@ datasource db {
 }
 
 model Docente {
-    id          Int         @id @default(autoincrement())
-    cf          String      @unique
-    nome        String
-    cognome     String
-    email       String      @unique
-    solfeggio   Boolean     @default(false)
-    alunni      Alunno[]
-    admin       Boolean     @default(false)
-    password    String
-    lezioni     Lezione[]
-    oreDiLavoro Int         @default(0)
+    id              Int         @id @default(autoincrement())
+    cf              String      @unique
+    nome            String
+    cognome         String
+    email           String      @unique
+    solfeggio       Boolean     @default(false)
+    alunni          Alunno[]
+    admin           Boolean     @default(false)
+    password        String
+    lezioni         Lezione[]
+    oreDiLavoro     Int         @default(0)
+    oreRecuperare   Int         @default(0)
 }
 
 model Alunno {
@@ -46,6 +47,7 @@ model Lezione {
     orario         DateTime
     libretto       Libretto?
     note           String?
+    daRecuperare   Int      @default(0)
 }
 
 enum Libretto {

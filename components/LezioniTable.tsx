@@ -39,6 +39,7 @@ export default function LezioniTable({content}: Props) {
                 accessor: "risultato",
                 Cell: () => {
                     return <select className="w-100">
+                        <option value="PRESENTE">---</option>
                         <option value="PRESENTE">Presente</option>
                         <option value="ASSENTE_GIUSTIFICATO">Assente Giustificato</option>
                         <option value="ASSENTE_NON_GIUSTIFICATO">Assente non giustificato</option>

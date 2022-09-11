@@ -1,0 +1,77 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <title>Inserimenti della morte</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+</head>
+<body>
+<table id="myTable" class="table table-responsive">
+    <thead>
+    <tr>
+        <th scope="col">Nome</th>
+        <th scope="col">Cogome</th>
+        <th scope="col">e-mail</th>
+        <th scope="col">C.F.</th>
+        <th scope="col">Solfeggio</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>
+            <input type="text">
+        </td>
+        <td>
+            <input type="text">
+        </td>
+        <td>
+            <input type="text">
+        </td>
+        <td>
+            <input type="text">
+        </td>
+        <td>
+            <input type="checkbox">
+        </td>
+    </tr>
+    </tbody>
+</table>
+<div id="button_div" >
+    <button type="button" class="btn btn-secondary" onclick="insertRow()">
+        Inserisci nuova riga
+    </button>
+    <button type="button" class="btn btn-primary" onclick="saveToDB()">
+        Salva
+    </button>
+    <script>
+        //TODO:
+        // Add saveToDB function for the insert query in DB
+    </script>
+
+
+</div>
+<script>
+    function insertRow(){
+        var table=document.getElementById("myTable");
+        var row=table.insertRow(1);
+        var name=row.insertCell(0);
+        var cog=row.insertCell(1);
+        var email=row.insertCell(2);
+        var cf=row.insertCell(3);
+        var solf=row.insertCell(4);
+        name.innerHTML = '<input type="text">';
+        cog.innerHTML = '<input type="text">';
+        email.innerHTML = '<input type="text">';
+        cf.innerHTML = '<input type="text">';
+        solf.innerHTML = '<input type="checkbox">';
+    }
+
+</script>
+
+</body>
+</html>
