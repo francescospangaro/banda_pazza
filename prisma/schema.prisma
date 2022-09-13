@@ -25,6 +25,15 @@ model Docente {
     oreRecuperare   Int         @default(0)
 }
 
+model LezioneSolfeggio {
+    id              Int      @id @default(autoincrement())
+    docente         Docente  @relation(fields: [docenteId], references: [id])
+    docenteId       Int
+    alunni          Alunno[]
+    orario          DateTime
+    note            String?
+}
+
 model Alunno {
     id             Int     @id @default(autoincrement())
     cf             String  @unique

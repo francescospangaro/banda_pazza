@@ -70,9 +70,6 @@ const Home: NextPage<Props> = (props) => {
                         <div className="alert alert-danger" role="alert">
                             Hai lezioni da recuperare!
                         </div>
-                        <div className="alert alert-success" role="alert">
-                            Nessuna lezione da recuperare!
-                        </div>
                     </Row>
                     <LezioniTable content={lezioni?.map(lezione => {
                         return {
