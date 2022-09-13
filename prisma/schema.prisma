@@ -44,7 +44,8 @@ model Lezione {
     docenteId      Int
     alunno         Alunno    @relation(fields: [alunnoId], references: [id])
     alunnoId       Int
-    orario         DateTime
+    orarioDiInizio DateTime
+    orarioDiFine   DateTime
     libretto       Libretto?
     note           String?
     daRecuperare   Int      @default(0)

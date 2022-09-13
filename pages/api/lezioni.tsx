@@ -8,7 +8,8 @@ export type Lezione = {
         nome: string;
         cognome: string;
     }
-    orario: Date;
+    orarioDiInizio: Date;
+    orarioDiFine: Date;
 }
 
 async function lezioniRoute(req: NextApiRequest, res: NextApiResponse<Lezione[]>) {
@@ -24,9 +25,10 @@ async function lezioniRoute(req: NextApiRequest, res: NextApiResponse<Lezione[]>
     const lezioni = await prisma.lezione.findMany({
         where: {
             docenteId: user.id,
-            orario: { lte: to, gte: from }
+            orarioDiInizio: { lte: to, gte: from },
         },
         include: { alunno: true },
+        orderBy: [{ orarioDiInizio: 'asc' }],
     })
 
     res.status(200).json(lezioni.map(lezione => {
@@ -35,7 +37,8 @@ async function lezioniRoute(req: NextApiRequest, res: NextApiResponse<Lezione[]>
                 nome: lezione.alunno.nome,
                 cognome: lezione.alunno.cognome,
             },
-            orario: lezione.orario,
+            orarioDiInizio: lezione.orarioDiInizio,
+            orarioDiFine: lezione.orarioDiFine,
         }
     }))
 }

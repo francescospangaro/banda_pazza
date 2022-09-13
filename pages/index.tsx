@@ -51,7 +51,8 @@ const Home: NextPage<Props> = (props) => {
             }).then(r => r.json()).then(lezioni => lezioni.map((lezione: any) => {
                 return {
                     ...lezione,
-                    orario: new Date(lezione.orario),
+                    orarioDiInizio: new Date(lezione.orarioDiInizio),
+                    orarioDiFine: new Date(lezione.orarioDiFine),
                 }
             }));
         });
@@ -77,7 +78,8 @@ const Home: NextPage<Props> = (props) => {
                         return {
                             nome: lezione.alunno.nome,
                             cognome: lezione.alunno.cognome,
-                            orario: lezione.orario,
+                            orarioDiInizio: lezione.orarioDiInizio,
+                            orarioDiFine: lezione.orarioDiFine,
                             risultato: Libretto.PRESENTE,
                             note: '',
                         }
