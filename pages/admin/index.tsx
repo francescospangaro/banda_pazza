@@ -99,7 +99,7 @@ const Home: NextPage<Props> = (props) => {
                                 <Form.Control className="w-100" type="date" name="startDate" defaultValue={filter.startDate?.toLocaleDateString(
                                     'en-CA',
                                     {year: "numeric", month: "2-digit", day: "2-digit"},
-                                )} />
+                                )} size="sm" />
                             </Col>
 
                             <Col className="col-md-6 col-12">
@@ -107,31 +107,31 @@ const Home: NextPage<Props> = (props) => {
                                 <Form.Control className="w-100" type="date" name="endDate" defaultValue={filter.endDate?.toLocaleDateString(
                                     'en-CA',
                                     {year: "numeric", month: "2-digit", day: "2-digit"},
-                                )} />
+                                )} size="sm" />
                             </Col>
 
                             <Col className="col-md-6 col-12">
                                 <Form.Label>Nome Docente</Form.Label>
-                                <Form.Control type="text" className="w-100" name="nomeDocente" defaultValue={filter.docente.nome} />
+                                <Form.Control type="text" className="w-100" name="nomeDocente" defaultValue={filter.docente.nome} size="sm" />
                             </Col>
 
                             <Col className="col-md-6 col-12">
                                 <Form.Label>Cognome Docente</Form.Label>
-                                <Form.Control type="text" className="w-100" name="cognomeDocente" defaultValue={filter.docente.cognome} />
+                                <Form.Control type="text" className="w-100" name="cognomeDocente" defaultValue={filter.docente.cognome} size="sm" />
                             </Col>
 
                             <Col className="col-md-6 col-12">
                                 <Form.Label>Nome Alunno</Form.Label>
-                                <Form.Control type="text" className="w-100" name="nomeAlunno" defaultValue={filter.alunno.nome} />
+                                <Form.Control type="text" className="w-100" name="nomeAlunno" defaultValue={filter.alunno.nome} size="sm" />
                             </Col>
 
                             <Col className="col-md-6 col-12">
                                 <Form.Label>Cognome Alunno</Form.Label>
-                                <Form.Control type="text" className="w-100" name="cognomeAlunno" defaultValue={filter.alunno.cognome} />
+                                <Form.Control type="text" className="w-100" name="cognomeAlunno" defaultValue={filter.alunno.cognome} size="sm" />
                             </Col>
 
                             <Col className="col-md-auto col-12">
-                                <Button className="w-100" type="submit">Filtra</Button>
+                                <Button className="w-100" type="submit" size="sm">Filtra</Button>
                             </Col>
                         </Form>
                     </Row>
