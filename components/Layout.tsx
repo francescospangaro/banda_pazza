@@ -72,24 +72,20 @@ export default function Layout({ children, requiresAuth, loading }: {
           height: 100vh;
           min-height: 100vh;
           max-height: 100vh;
-          display: flex;
-          flex-flow: column;
+          display: grid;
+          grid-template-rows: auto minmax(0, 1fr);
         }
         .layout-container {
           flex: 1 1 auto;
-          //noinspection CssInvalidPropertyValue
-          height: stretch;
           max-width: 65rem;
           margin: 1.5rem auto;
           padding-left: 1rem;
           padding-right: 1rem;
-          display: flex;
-          flex-flow: column;
+          display: grid;
+          grid-template-rows: minmax(0, 1fr) auto;
         }
         
         main {
-          //noinspection CssInvalidPropertyValue
-          height: stretch;
           flex: 1 1 auto;
           display: flex;
           flex-flow: column;
