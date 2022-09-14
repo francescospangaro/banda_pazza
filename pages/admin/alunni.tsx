@@ -32,7 +32,7 @@ const Home: NextPage<Props> = (props) => {
         <Layout requiresAuth>
             <Container fluid className={styles.container}>
                 <main className={styles.main}>
-                    <Row className="mb-3 w-100 align-items-start overflow-auto flex-grow-1 flex-shrink-1">
+                    <Row className="mb-3 align-items-start overflow-auto flex-grow-1 flex-shrink-1" style={{ width: "fit-content"}}>
                         <AlunniTable content={props.alunni}/>
                     </Row>
 

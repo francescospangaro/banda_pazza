@@ -78,7 +78,7 @@ const Home: NextPage<Props> = (props) => {
             <Container fluid className={styles.container}>
                 <main className={styles.main}>
                     <Row className="mb-3 w-100 align-items-center">
-                        <Form className="row g-3 justify-content-center" onSubmit={(e) => {
+                        <Form className="row g-3 justify-content-center flex-grow-0 flex-shrink-1" onSubmit={(e) => {
                             e.preventDefault()
                             setFilter({
                                 docente: {
@@ -135,7 +135,7 @@ const Home: NextPage<Props> = (props) => {
                         </Form>
                     </Row>
 
-                    <Row className="mb-3 w-100 align-items-center overflow-auto">
+                    <Row className="mb-3 align-items-center overflow-auto flex-grow-1 flex-shrink-1" style={{ width: "fit-content"}}>
                         <LezioniAdvancedTable content={lezioni?.map(lezione => {
                             return {
                                 id: lezione.id,
@@ -162,7 +162,7 @@ const Home: NextPage<Props> = (props) => {
                         }} />
                     </Row>
 
-                    <Row className="mb-3 w-100 justify-content-center">
+                    <Row className="mb-3 w-100 justify-content-center flex-grow-0 flex-shrink-1">
                         <Col className="col-md-auto col-12 mb-3">
                             <Button className="w-100" onClick={() => setShowAddModal(true) }>Aggiungi</Button>
                         </Col>
