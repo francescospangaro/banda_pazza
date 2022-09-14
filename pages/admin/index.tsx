@@ -139,7 +139,7 @@ const Home: NextPage<Props> = (props) => {
 
                     <Row
                         className={"mb-3 align-items-start flex-grow-1 flex-shrink-1" + (isDesktop ? ' overflow-auto' : '')}
-                        style={{ width: "fit-content"}}
+                        style={{ width: "100%", minWidth: "fit-content" }}
                     >
                         <LezioniAdvancedTable content={lezioni?.map(lezione => {
                             return {
