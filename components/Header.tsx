@@ -27,9 +27,9 @@ export default function Header() {
                     <Nav className="me-auto">
                         {user?.admin && (
                             <>
-                                <Nav.Link><Link href="/admin/">Lezioni</Link></Nav.Link>
-                                <Nav.Link><Link href="/admin/docenti">Docenti</Link></Nav.Link>
-                                <Nav.Link><Link href="/admin/alunni">Alunni</Link></Nav.Link>
+                                <Link href="/admin/" passHref><Nav.Link>Lezioni</Nav.Link></Link>
+                                <Link href="/admin/docenti" passHref><Nav.Link>Docenti</Nav.Link></Link>
+                                <Link href="/admin/alunni" passHref><Nav.Link>Alunni</Nav.Link></Link>
                             </>
                         )}
                     </Nav>
