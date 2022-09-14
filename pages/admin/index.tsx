@@ -136,7 +136,7 @@ const Home: NextPage<Props> = (props) => {
                         </Form>
                     </Row>
 
-                    <Row className="mb-3 w-100 align-items-center">
+                    <Row className="mb-3 w-100 align-items-center overflow-auto">
                         <LezioniAdvancedTable content={lezioni?.map(lezione => {
                             return {
                                 id: lezione.id,
