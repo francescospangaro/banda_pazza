@@ -41,7 +41,7 @@ const Home: NextPage<Props> = (props) => {
                         <AlunniTable content={props.alunni}/>
                     </Row>
 
-                    <Row className="mb-3 w-100 justify-content-center flex-grow-0 flex-shrink-1">
+                    <Row className="w-100 justify-content-center flex-grow-0 flex-shrink-1">
                         <Col className="col-md-auto col-12 mb-3">
                             <Button className="w-100" onClick={() => setShowAddModal(true) }>Aggiungi</Button>
                         </Col>

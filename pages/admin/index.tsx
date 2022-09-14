@@ -80,7 +80,7 @@ const Home: NextPage<Props> = (props) => {
             <Container fluid className={styles.container}>
                 <main className={styles.main}>
                     <Row className="mb-3 w-100 align-items-center">
-                        <Form className="row g-3 justify-content-center flex-grow-0 flex-shrink-1" onSubmit={(e) => {
+                        <Form className="row g-3 gy-md-1 justify-content-center flex-grow-0 flex-shrink-1" onSubmit={(e) => {
                             e.preventDefault()
                             setFilter({
                                 docente: {
