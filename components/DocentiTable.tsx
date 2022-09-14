@@ -51,6 +51,7 @@ export default function DocentiTable({content, onResetPasswordFor}: Props) {
                 Cell: (props) => {
                     const docenteId = props.row.original.id;
                     return <Button size="sm"
+                                   className="w-100"
                                    disabled={resettingDocenti.has(docenteId)}
                                    onClick={async () => {
                                        if(!onResetPasswordFor)
