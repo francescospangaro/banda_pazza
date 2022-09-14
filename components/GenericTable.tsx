@@ -58,6 +58,9 @@ export default function GenericTable<T extends object = {}>({ options }: { optio
                 .responsiveTable.kill-table-header td.pivoted {
                   padding-left: 10px !important;
                 }
+                .responsiveTable.kill-table-header td.pivoted .tdBefore {
+                  display: none;
+                }
             `}</style>
         </Table>
     );
