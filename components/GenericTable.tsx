@@ -16,7 +16,7 @@ export default function GenericTable<T extends object = {}>({ options }: { optio
                 <Tr>
                     {headerGroups.map((headerGroup) => (
                         headerGroup.headers.map((column) => (
-                            <Th {...column.getHeaderProps(column.getSortByToggleProps())} >
+                            <Th {...column.getHeaderProps(column.getSortByToggleProps())} style={{ whiteSpace: "nowrap" }}>
                                 {column.render("Header")}
                                 <span className="ms-2" style={{ alignSelf: "end" }}>
                                     <FontAwesomeIcon icon={column.isSorted ? column.isSortedDesc ?
