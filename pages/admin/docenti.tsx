@@ -6,6 +6,7 @@ import {Button, Col, Container, Row} from "react-bootstrap"
 import DocentiTable, {Docente} from "../../components/DocentiTable";
 import styles from "../../styles/Home.module.css";
 import {prisma} from "../../lib/database"
+import useMediaQuery from "@restart/hooks/useMediaQuery";
 
 type Props = {
     docenti: Docente[],
@@ -28,11 +29,15 @@ export const getServerSideProps = requireAuth<Props>(async (ctx) => {
 const Home: NextPage<Props> = (props) => {
     const [showAddModal, setShowAddModal] = useState(false);
 
+    const isDesktop = useMediaQuery("(min-width: 992px)")
     return <>
         <Layout requiresAuth>
             <Container fluid className={styles.container}>
                 <main className={styles.main}>
-                    <Row className="mb-3 align-items-start overflow-auto flex-grow-1 flex-shrink-1" style={{ width: "fit-content"}}>
+                    <Row
+                        className={"mb-3 align-items-start flex-grow-1 flex-shrink-1" + (isDesktop ? ' overflow-auto' : '')}
+                        style={{ width: "fit-content"}}
+                    >
                         <DocentiTable content={props.docenti}/>
                     </Row>
 

@@ -13,6 +13,7 @@ import {Libretto} from ".prisma/client"
 import {Container, Col, Row, Form, Button} from "react-bootstrap"
 import AddLezioniModal from "../../components/AddLezioniModal";
 import DeleteLezioniModal from "../../components/DeleteLezioniModal";
+import useMediaQuery from "@restart/hooks/useMediaQuery";
 
 type Props = {
     docenti: {
@@ -73,6 +74,7 @@ const Home: NextPage<Props> = (props) => {
             }));
         });
 
+    const isDesktop = useMediaQuery("(min-width: 992px)")
     return <>
         <Layout requiresAuth loading={isValidating}>
             <Container fluid className={styles.container}>
@@ -93,7 +95,7 @@ const Home: NextPage<Props> = (props) => {
                                 endDate: e.currentTarget.startDate.value ? new Date(e.currentTarget.endDate.value) : null,
                             })
                         }}>
-                            <Col className="col-md-6 col-12">
+                            <Col className="col-md-2 col-12">
                                 <Form.Label>Data inizio</Form.Label>
                                 <Form.Control className="w-100" type="date" name="startDate" defaultValue={filter.startDate?.toLocaleDateString(
                                     'en-CA',
@@ -101,7 +103,7 @@ const Home: NextPage<Props> = (props) => {
                                 )} size="sm" />
                             </Col>
 
-                            <Col className="col-md-6 col-12">
+                            <Col className="col-md-2 col-12">
                                 <Form.Label>Data fine</Form.Label>
                                 <Form.Control className="w-100" type="date" name="endDate" defaultValue={filter.endDate?.toLocaleDateString(
                                     'en-CA',
@@ -109,33 +111,36 @@ const Home: NextPage<Props> = (props) => {
                                 )} size="sm" />
                             </Col>
 
-                            <Col className="col-md-6 col-12">
+                            <Col className="col-md-2 col-12">
                                 <Form.Label>Nome Docente</Form.Label>
                                 <Form.Control type="text" className="w-100" name="nomeDocente" defaultValue={filter.docente.nome} size="sm" />
                             </Col>
 
-                            <Col className="col-md-6 col-12">
+                            <Col className="col-md-2 col-12">
                                 <Form.Label>Cognome Docente</Form.Label>
                                 <Form.Control type="text" className="w-100" name="cognomeDocente" defaultValue={filter.docente.cognome} size="sm" />
                             </Col>
 
-                            <Col className="col-md-6 col-12">
+                            <Col className="col-md-2 col-12">
                                 <Form.Label>Nome Alunno</Form.Label>
                                 <Form.Control type="text" className="w-100" name="nomeAlunno" defaultValue={filter.alunno.nome} size="sm" />
                             </Col>
 
-                            <Col className="col-md-6 col-12">
+                            <Col className="col-md-2 col-12">
                                 <Form.Label>Cognome Alunno</Form.Label>
                                 <Form.Control type="text" className="w-100" name="cognomeAlunno" defaultValue={filter.alunno.cognome} size="sm" />
                             </Col>
 
-                            <Col className="col-md-auto col-12">
+                            <Col className="col-md-2 col-12">
                                 <Button className="w-100" type="submit" size="sm">Filtra</Button>
                             </Col>
                         </Form>
                     </Row>
 
-                    <Row className="mb-3 align-items-center overflow-auto flex-grow-1 flex-shrink-1" style={{ width: "fit-content"}}>
+                    <Row
+                        className={"mb-3 align-items-start flex-grow-1 flex-shrink-1" + (isDesktop ? ' overflow-auto' : '')}
+                        style={{ width: "fit-content"}}
+                    >
                         <LezioniAdvancedTable content={lezioni?.map(lezione => {
                             return {
                                 id: lezione.id,

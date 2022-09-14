@@ -89,6 +89,7 @@ export default function Layout({ children, requiresAuth, loading }: {
           flex: 1 1 auto;
           display: flex;
           flex-flow: column;
+          overflow: auto;
         }
         
         footer {
