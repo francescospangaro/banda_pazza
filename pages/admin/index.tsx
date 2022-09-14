@@ -52,8 +52,8 @@ const Home: NextPage<Props> = (props) => {
             nome: '',
             cognome: '',
         },
-        startDate: new Date(),
-        endDate: undefined as any as Date,
+        startDate: new Date() as (Date | undefined | null),
+        endDate: undefined as (Date | undefined | null),
     });
     const [showAddModal, setShowAddModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -211,7 +211,7 @@ const Home: NextPage<Props> = (props) => {
                              const res = await fetch('/api/admin/lezione', {
                                  method: 'DELETE',
                                  headers: { 'Content-Type': 'application/json' },
-                                 body: JSON.stringify([...selectedLezioni])
+                                 body: JSON.stringify(Array.from(selectedLezioni.keys()))
                              });
 
                              if(res.ok) {
