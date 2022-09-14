@@ -20,9 +20,11 @@ export default function Layout({ children, requiresAuth, loading }: {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
-            {requiresAuth && user?.isLoggedIn === true && (
-                <Header />
-            )}
+            <header>
+                {requiresAuth && user?.isLoggedIn === true && (
+                    <Header />
+                )}
+            </header>
 
             <div className="layout-container">
                 <main>
