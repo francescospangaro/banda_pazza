@@ -2,9 +2,9 @@ import {withIronSessionSsr} from "iron-session/next";
 import {sessionOptions} from "./session";
 import {GetServerSidePropsContext, GetServerSidePropsResult} from "next";
 
-export default (gssp: (
+export default <P  extends { [key: string]: unknown } = { [key: string]: unknown }>(gssp: (
     context: GetServerSidePropsContext,
-) => Promise<GetServerSidePropsResult<any>>, admin?: boolean) =>
+) => Promise<GetServerSidePropsResult<P>>, admin?: boolean) =>
     withIronSessionSsr(async (ctx) => {
         const user = ctx.req.session.user;
 
