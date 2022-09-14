@@ -1,7 +1,7 @@
 import { withIronSessionApiRoute } from 'iron-session/next'
 import { sessionOptions } from '../../lib/session'
 import { NextApiRequest, NextApiResponse } from 'next'
-import {PrismaClient} from "@prisma/client";
+import { prisma } from '../../lib/database'
 
 export type Lezione = {
     alunno: {
@@ -21,7 +21,6 @@ async function lezioniRoute(req: NextApiRequest, res: NextApiResponse<Lezione[]>
     if(!user || user?.isLoggedIn !== true)
         return res.status(401).end();
 
-    const prisma = new PrismaClient();
     const lezioni = await prisma.lezione.findMany({
         where: {
             docenteId: user.id,

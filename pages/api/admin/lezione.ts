@@ -1,7 +1,7 @@
 import {withIronSessionApiRoute} from 'iron-session/next'
 import {sessionOptions} from '../../../lib/session'
 import {NextApiRequest, NextApiResponse} from 'next'
-import {PrismaClient} from "@prisma/client";
+import { prisma } from '../../../lib/database'
 
 export type LezioneToGenerate = {
     alunnoId: number,
@@ -33,7 +33,6 @@ async function lezioneRoute(req: NextApiRequest, res: NextApiResponse) {
             }
         });
 
-        const prisma = new PrismaClient();
         const dupes = await prisma.lezione.aggregate({
             where: {
                 OR: databaseLessons.flatMap(lezione => {
@@ -91,8 +90,6 @@ async function lezioneRoute(req: NextApiRequest, res: NextApiResponse) {
         if (!lessons)
             return res.status(200).end();
 
-        console.log(lessons)
-        const prisma = new PrismaClient();
         await prisma.lezione.deleteMany({
             where: { id: { in: lessons.map((lezioneId: any) => Number(lezioneId)) }},
         });

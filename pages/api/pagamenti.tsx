@@ -1,7 +1,7 @@
 import {withIronSessionApiRoute} from 'iron-session/next'
 import {sessionOptions} from '../../lib/session'
 import {NextApiRequest, NextApiResponse} from 'next'
-import {PrismaClient} from "@prisma/client";
+import { prisma } from '../../lib/database'
 
 export type OreLavorative = {
     ore: number;
@@ -12,7 +12,6 @@ async function oreRoute(req: NextApiRequest, res: NextApiResponse<OreLavorative>
     if (!user || user?.isLoggedIn !== true)
         return res.status(401).end();
 
-    const prisma = new PrismaClient();
     const orario = await prisma.docente.findUnique({
         where: {id: user.id},
         select: {oreDiLavoro: true},

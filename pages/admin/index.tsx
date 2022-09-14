@@ -1,7 +1,7 @@
 import type {NextPage} from 'next'
 import styles from '../../styles/Home.module.css'
 
-import {PrismaClient} from "@prisma/client"
+import { prisma } from '../../lib/database'
 import React, {useState} from "react";
 import Layout from "../../components/Layout"
 import LezioniAdvancedTable from "../../components/LezioniAdvancedTable";
@@ -26,7 +26,6 @@ type Props = {
 }
 
 export const getServerSideProps = requireAuth(async (ctx) => {
-    const prisma = new PrismaClient();
     return {
         props: {
             docenti: (await prisma.docente.findMany({})).map(d => { return {
