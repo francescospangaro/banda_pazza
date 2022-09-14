@@ -20,33 +20,11 @@ export default function Layout({ children, requiresAuth, loading }: {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
-            <style jsx global>{`
-        *,
-        *::before,
-        *::after {
-          box-sizing: border-box;
-        }
-        html, body {
-          margin: 0;
-        }
-        body {
-          margin: 0;
-          color: #333;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-            'Helvetica Neue', Arial, Noto Sans, sans-serif, 'Apple Color Emoji',
-            'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-        }
-        #__next {
-          min-height: 100vh;
-          display: flex;
-          flex-flow: column;
-        }
-      `}</style>
             {requiresAuth && user?.isLoggedIn === true && (
                 <Header />
             )}
 
-            <div className="container">
+            <div className="layout-container">
                 <main>
                     {(!requiresAuth || !isValidatingUser || user?.isLoggedIn === true) && children}
                 </main>
@@ -73,10 +51,34 @@ export default function Layout({ children, requiresAuth, loading }: {
                 </div>
             )}
 
+            {/* eslint-disable-next-line react/no-unknown-property */}
             <style jsx>{`
-        .container {
+        :global(*,
+        *::before,
+        *::after) {
+          box-sizing: border-box;
+        }
+        :global(html, body) {
+          margin: 0;
+        }
+        :global(body) {
+          margin: 0;
+          color: #333;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+            'Helvetica Neue', Arial, Noto Sans, sans-serif, 'Apple Color Emoji',
+            'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+        }
+        :global(#__next) {
+          height: 100vh;
+          min-height: 100vh;
+          max-height: 100vh;
+          display: flex;
+          flex-flow: column;
+        }
+        .layout-container {
           flex: 1 1 auto;
-          height: 100%;
+          //noinspection CssInvalidPropertyValue
+          height: stretch;
           max-width: 65rem;
           margin: 1.5rem auto;
           padding-left: 1rem;
@@ -86,6 +88,8 @@ export default function Layout({ children, requiresAuth, loading }: {
         }
         
         main {
+          //noinspection CssInvalidPropertyValue
+          height: stretch;
           flex: 1 1 auto;
           display: flex;
           flex-flow: column;
