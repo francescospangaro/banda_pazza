@@ -15,26 +15,35 @@ export default function GenericTable<T extends object = {}>({ options }: { optio
             {isNotMobile && (<Thead>
                 <Tr>
                     {headerGroups.map((headerGroup) => (
-                        headerGroup.headers.map((column) => (
-                            <Th {...column.getHeaderProps(column.getSortByToggleProps())} style={{ whiteSpace: "nowrap" }}>
-                                {column.render("Header")}
-                                <span className="ms-2" style={{ alignSelf: "end" }}>
+                        headerGroup.headers.map((column) => {
+                            const { key, ...restColumn } = column.getHeaderProps();
+                            return (
+                                <Th
+                                    key={key}
+                                    {...restColumn}
+                                    style={{ whiteSpace: "nowrap" }}
+                                >
+                                    {column.render("Header")}
+                                    <span className="ms-2" style={{ alignSelf: "end" }}>
                                     <FontAwesomeIcon icon={column.isSorted ? column.isSortedDesc ?
                                         faSortDown : faSortUp : faSort} size="2xs"/>
                                 </span>
-                            </Th>
-                        ))
+                                </Th>
+                            );
+                        })
                     ))}
                 </Tr>
             </Thead>)}
             <Tbody {...getTableBodyProps()}>
                 {rows.map((row) => {
                     prepareRow(row);
+                    const { key, ...restRowProps } = row.getRowProps();
                     return (
-                        <Tr {...row.getRowProps()}>
+                        <Tr key={key} {...restRowProps}>
                             {row.cells.map((cell) => {
+                                const { key, ...restCellProps } = cell.getCellProps();
                                 return (
-                                    <Td {...cell.getCellProps()}>
+                                    <Td key={key} {...restCellProps}>
                                         {cell.render("Cell")}
                                     </Td>
                                 );
