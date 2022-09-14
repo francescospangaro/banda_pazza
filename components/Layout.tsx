@@ -77,8 +77,8 @@ export default function Layout({ children, requiresAuth, loading }: {
         }
         .layout-container {
           flex: 1 1 auto;
-          max-width: 65rem;
-          margin: 1.5rem auto;
+          max-width: 75rem;
+          margin: 1.5rem auto 0 auto;
           padding-left: 1rem;
           padding-right: 1rem;
           display: grid;
@@ -95,7 +95,7 @@ export default function Layout({ children, requiresAuth, loading }: {
         footer {
           display: flex;
           flex: 0 0 auto;
-          padding: 2rem 0;
+          padding: 0.5rem 0;
           border-top: 1px solid #eaeaea;
           justify-content: center;
           align-items: center;
