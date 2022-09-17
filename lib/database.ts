@@ -1,4 +1,5 @@
 import {PrismaClient} from '@prisma/client'
+export {Prisma} from '@prisma/client'
 
 declare global {
     // allow global `var` declarations
