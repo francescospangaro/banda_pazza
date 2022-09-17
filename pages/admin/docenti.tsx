@@ -8,7 +8,6 @@ import DocentiTable from "../../components/DocentiTable";
 import DocenteModal, {AddProps, EditProps} from "../../components/DocenteModal";
 import styles from "../../styles/Home.module.css";
 import {prisma} from "../../lib/database"
-import useMediaQuery from "@restart/hooks/useMediaQuery";
 
 type Props = {
     docenti: Docente[],
@@ -34,20 +33,14 @@ const Home: NextPage<Props> = (props) => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [editingDocente, setEditingDocente] = useState<Docente | null>(null);
 
-    const isDesktop = useMediaQuery("(min-width: 992px)")
     return <>
         <Layout requiresAuth>
             <Container fluid className={styles.container}>
                 <main className={styles.main}>
-                    <Row
-                        className={"mb-3 align-items-start flex-grow-1 flex-shrink-1" + (isDesktop ? ' overflow-auto' : '')}
-                        style={{ width: "100%", minWidth: "fit-content" }}
-                    >
-                        <DocentiTable content={docenti} onEdit={async docente => {
-                            setEditingDocente(docente);
-                            setShowEditModal(true);
-                        }}/>
-                    </Row>
+                    <DocentiTable scrollable content={docenti} onEdit={async docente => {
+                        setEditingDocente(docente);
+                        setShowEditModal(true);
+                    }}/>
 
                     <Row className="w-100 justify-content-center flex-grow-0 flex-shrink-1">
                         <Col className="col-md-auto col-12 mb-3">

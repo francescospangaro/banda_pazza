@@ -13,10 +13,11 @@ export type Content = {
 }
 
 type Props = {
-    content: Content[]
+    content: Content[],
+    scrollable?: boolean,
 }
 
-export default function LezioniTable({content}: Props) {
+export default function LezioniTable({content, scrollable}: Props) {
     const columns = useMemo<Column<Content>[]>(
         () => [
             {
@@ -68,5 +69,6 @@ export default function LezioniTable({content}: Props) {
         columns,
         data: content,
         autoResetHiddenColumns: false,
+        scrollable: scrollable,
     }} />;
 }

@@ -13,7 +13,6 @@ import {Libretto} from ".prisma/client"
 import {Container, Col, Row, Form, Button} from "react-bootstrap"
 import AddLezioniModal from "../../components/AddLezioniModal";
 import DeleteLezioniModal from "../../components/DeleteLezioniModal";
-import useMediaQuery from "@restart/hooks/useMediaQuery";
 
 type Props = {
     docenti: {
@@ -74,7 +73,6 @@ const Home: NextPage<Props> = (props) => {
             }));
         });
 
-    const isDesktop = useMediaQuery("(min-width: 992px)")
     return <>
         <Layout requiresAuth loading={isValidating}>
             <Container fluid className={styles.container}>
@@ -137,35 +135,30 @@ const Home: NextPage<Props> = (props) => {
                         </Form>
                     </Row>
 
-                    <Row
-                        className={"mb-3 align-items-start flex-grow-1 flex-shrink-1" + (isDesktop ? ' overflow-auto' : '')}
-                        style={{ width: "100%", minWidth: "fit-content" }}
-                    >
-                        <LezioniAdvancedTable content={lezioni?.map(lezione => {
-                            return {
-                                id: lezione.id,
-                                docente: lezione.docente.nome + ' ' + lezione.docente.cognome,
-                                docenteId: lezione.docente.id,
-                                alunno: lezione.alunno.nome + ' ' + lezione.alunno.cognome,
-                                alunnoId: lezione.alunno.id,
-                                orarioDiInizio: lezione.orarioDiInizio,
-                                orarioDiFine: lezione.orarioDiFine,
-                                risultato: Libretto.PRESENTE,
-                                note: '',
-                                selectable: true,
-                                selected: selectedLezioni.has(lezione.id),
-                            }
-                        }) ?? []} onSelectLezione={(lezione, selected) => {
-                            setSelectedLezioni(lezioni => {
-                                const newLezioni = new Set(lezioni);
-                                if(selected)
-                                    newLezioni.add(lezione.id);
-                                else
-                                    newLezioni.delete(lezione.id);
-                                return newLezioni;
-                            })
-                        }} />
-                    </Row>
+                    <LezioniAdvancedTable scrollable content={lezioni?.map(lezione => {
+                        return {
+                            id: lezione.id,
+                            docente: lezione.docente.nome + ' ' + lezione.docente.cognome,
+                            docenteId: lezione.docente.id,
+                            alunno: lezione.alunno.nome + ' ' + lezione.alunno.cognome,
+                            alunnoId: lezione.alunno.id,
+                            orarioDiInizio: lezione.orarioDiInizio,
+                            orarioDiFine: lezione.orarioDiFine,
+                            risultato: Libretto.PRESENTE,
+                            note: '',
+                            selectable: true,
+                            selected: selectedLezioni.has(lezione.id),
+                        }
+                    }) ?? []} onSelectLezione={(lezione, selected) => {
+                        setSelectedLezioni(lezioni => {
+                            const newLezioni = new Set(lezioni);
+                            if(selected)
+                                newLezioni.add(lezione.id);
+                            else
+                                newLezioni.delete(lezione.id);
+                            return newLezioni;
+                        })
+                    }} />
 
                     <Row className="mb-3 w-100 justify-content-center flex-grow-0 flex-shrink-1">
                         <Col className="col-md-auto col-12 mb-3">

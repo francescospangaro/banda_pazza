@@ -7,13 +7,14 @@ import {Docente} from "../pages/api/admin/docente";
 type Props = {
     content: Docente[],
     onEdit?: (docente: Docente) => Promise<any>,
+    scrollable?: boolean,
 }
 
 type TableDocente = Docente & {
     editable: boolean,
 }
 
-export default function DocentiTable({content, onEdit}: Props) {
+export default function DocentiTable({content, onEdit, scrollable}: Props) {
     const [editingDocenti, setEditingDocenti] = useState(new Set<number>());
     const tableData: TableDocente[] = content.map(docente => { return {
         ...docente,
@@ -74,5 +75,6 @@ export default function DocentiTable({content, onEdit}: Props) {
         columns,
         data: tableData,
         autoResetHiddenColumns: false,
+        scrollable: scrollable,
     }} />;
 }

@@ -20,10 +20,11 @@ export type Lezione = {
 
 type Props = {
     content: Lezione[]
-    onSelectLezione?: (lezione: Lezione, selected: boolean) => void;
+    onSelectLezione?: (lezione: Lezione, selected: boolean) => void,
+    scrollable?: boolean,
 }
 
-export default function LezioniAdvancedTable({content, onSelectLezione}: Props) {
+export default function LezioniAdvancedTable({content, onSelectLezione, scrollable}: Props) {
     const columns = useMemo<Column<Lezione>[]>(
         () => [
             {
@@ -95,6 +96,7 @@ export default function LezioniAdvancedTable({content, onSelectLezione}: Props) 
             columns,
             data: content,
             autoResetHiddenColumns: false,
+            scrollable: scrollable,
         }} />
     );
 }

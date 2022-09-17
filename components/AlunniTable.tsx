@@ -13,9 +13,10 @@ type Props = {
     content: Alunno[],
     docenti: Docente[],
     onEdit?: (alunno: Alunno) => Promise<any>,
+    scrollable?: boolean,
 }
 
-export default function AlunniTable({content, docenti, onEdit}: Props) {
+export default function AlunniTable({content, docenti, onEdit, scrollable}: Props) {
     const [editingAlunni, setEditingAlunni] = useState(new Set<number>());
     const tableData: TableAlunno[] = content.map(alunno => { return {
         ...alunno,
@@ -88,5 +89,6 @@ export default function AlunniTable({content, docenti, onEdit}: Props) {
         columns,
         data: tableData,
         autoResetHiddenColumns: false,
+        scrollable: scrollable,
     }} />;
 }
