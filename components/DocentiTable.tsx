@@ -2,29 +2,22 @@ import React, {useMemo, useState} from "react";
 import {Column} from "react-table";
 import GenericTable from "./GenericTable";
 import {Button} from "react-bootstrap";
-
-export type Docente = {
-    id: number,
-    nome: string,
-    cognome: string,
-    email: string,
-    cf: string,
-}
+import {Docente} from "../pages/api/admin/docente";
 
 type Props = {
     content: Docente[],
-    onResetPasswordFor?: (docente: Docente) => Promise<any>,
+    onEdit?: (docente: Docente) => Promise<any>,
 }
 
 type TableDocente = Docente & {
-    resettable: boolean,
+    editable: boolean,
 }
 
-export default function DocentiTable({content, onResetPasswordFor}: Props) {
-    const [resettingDocenti, setResettingDocenti] = useState(new Set<number>());
+export default function DocentiTable({content, onEdit}: Props) {
+    const [editingDocenti, setEditingDocenti] = useState(new Set<number>());
     const tableData: TableDocente[] = content.map(docente => { return {
         ...docente,
-        resettable: true,
+        editable: true,
     }})
 
     const columns = useMemo<Column<TableDocente>[]>(
@@ -46,35 +39,35 @@ export default function DocentiTable({content, onResetPasswordFor}: Props) {
                 accessor: "email",
             },
             {
-                Header: "Password",
-                accessor: "resettable",
+                Header: "",
+                accessor: "editable",
                 Cell: (props) => {
                     const docenteId = props.row.original.id;
                     return <Button size="sm"
                                    className="w-100"
-                                   disabled={resettingDocenti.has(docenteId)}
+                                   disabled={editingDocenti.has(docenteId)}
                                    onClick={async () => {
-                                       if(!onResetPasswordFor)
+                                       if(!onEdit)
                                            return;
 
-                                       setResettingDocenti(docenti => {
+                                       setEditingDocenti(docenti => {
                                            const newDocenti = new Set(docenti);
                                            newDocenti.add(docenteId);
                                            return newDocenti;
                                        });
 
-                                       await onResetPasswordFor(props.row.original)
+                                       await onEdit(props.row.original)
 
-                                       setResettingDocenti(docenti => {
+                                       setEditingDocenti(docenti => {
                                            const newDocenti = new Set(docenti);
                                            newDocenti.delete(docenteId);
                                            return newDocenti;
                                        });
-                                   }}>Reset</Button>
+                                   }}>Edit</Button>
                 },
             },
         ],
-        [onResetPasswordFor, resettingDocenti, setResettingDocenti]
+        [onEdit, editingDocenti, setEditingDocenti]
     );
 
     return <GenericTable<TableDocente> options={{

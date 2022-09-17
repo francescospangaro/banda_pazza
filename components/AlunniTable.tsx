@@ -1,22 +1,32 @@
 import React, {useMemo, useState} from "react";
 import {Column} from "react-table";
 import GenericTable from "./GenericTable";
+import {Button} from "react-bootstrap";
+import {Alunno} from "../pages/api/admin/alunno";
+import {Docente} from "../pages/api/admin/docente";
 
-export type Alunno = {
-    id: number,
-    nome: string,
-    cognome: string,
-    email: string,
-    cf: string,
+type TableAlunno = Alunno & {
+    editable: boolean,
 }
 
 type Props = {
     content: Alunno[],
+    docenti: Docente[],
+    onEdit?: (alunno: Alunno) => Promise<any>,
 }
 
-export default function AlunniTable({content}: Props) {
+export default function AlunniTable({content, docenti, onEdit}: Props) {
+    const [editingAlunni, setEditingAlunni] = useState(new Set<number>());
+    const tableData: TableAlunno[] = content.map(alunno => { return {
+        ...alunno,
+        editable: true,
+    }});
+    const idToDocente = docenti.reduce((map, docente) => {
+        map.set(docente.id, docente);
+        return map;
+    }, new Map<number, Docente>());
 
-    const columns = useMemo<Column<Alunno>[]>(
+    const columns = useMemo<Column<TableAlunno>[]>(
         () => [
             {
                 Header: "Nome",
@@ -34,13 +44,49 @@ export default function AlunniTable({content}: Props) {
                 Header: "Email",
                 accessor: "email",
             },
+            {
+                Header: "Docente",
+                accessor: "docenteId",
+                Cell: (props) => {
+                    const docente = idToDocente.get(props.row.original.docenteId)!;
+                    return <>{docente.nome + ' ' + docente.cognome}</>;
+                },
+            },
+            {
+                Header: "",
+                accessor: "editable",
+                Cell: (props) => {
+                    const alunnoId = props.row.original.id;
+                    return <Button size="sm"
+                                   className="w-100"
+                                   disabled={editingAlunni.has(alunnoId)}
+                                   onClick={async () => {
+                                       if(!onEdit)
+                                           return;
+
+                                       setEditingAlunni(alunni => {
+                                           const newAlunni = new Set(alunni);
+                                           newAlunni.add(alunnoId);
+                                           return newAlunni;
+                                       });
+
+                                       await onEdit(props.row.original)
+
+                                       setEditingAlunni(alunni => {
+                                           const newAlunni = new Set(alunni);
+                                           newAlunni.delete(alunnoId);
+                                           return newAlunni;
+                                       });
+                                   }}>Edit</Button>
+                },
+            },
         ],
-        []
+        [onEdit, editingAlunni, setEditingAlunni, idToDocente]
     );
 
-    return <GenericTable<Alunno> options={{
+    return <GenericTable<TableAlunno> options={{
         columns,
-        data: content,
+        data: tableData,
         autoResetHiddenColumns: false,
     }} />;
 }
