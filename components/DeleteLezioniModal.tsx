@@ -20,7 +20,7 @@ export default function DeleteLezioniModal({ show, handleClose, handleSubmit }: 
     return (
         <Modal show={show} onHide={handleClose}>
             <Modal.Header closeButton>
-                <Modal.Title>Aggiungi lezioni</Modal.Title>
+                <Modal.Title>Elimina lezioni</Modal.Title>
             </Modal.Header>
 
             <Modal.Body>
