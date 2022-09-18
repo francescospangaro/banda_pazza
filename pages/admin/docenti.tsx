@@ -37,16 +37,16 @@ const Home: NextPage<Props> = (props) => {
         <Layout requiresAuth>
             <Container fluid className={styles.container}>
                 <main className={styles.main}>
-                    <DocentiTable scrollable content={docenti} onEdit={async docente => {
-                        setEditingDocente(docente);
-                        setShowEditModal(true);
-                    }}/>
-
-                    <Row className="w-100 justify-content-center flex-grow-0 flex-shrink-1">
+                    <Row className="w-100 flex-grow-0 flex-shrink-1">
                         <Col className="col-md-auto col-12 mb-3">
                             <Button className="w-100" onClick={() => setShowAddModal(true) }>Aggiungi</Button>
                         </Col>
                     </Row>
+
+                    <DocentiTable scrollable content={docenti} onEdit={async docente => {
+                        setEditingDocente(docente);
+                        setShowEditModal(true);
+                    }}/>
                 </main>
             </Container>
         </Layout>
