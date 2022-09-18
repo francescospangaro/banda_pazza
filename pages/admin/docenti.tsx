@@ -13,7 +13,7 @@ type Props = {
     docenti: Docente[],
 };
 
-export const getServerSideProps = requireAuth<Props>(async (ctx) => {
+export const getServerSideProps = requireAuth<Props>(async () => {
     return {
         props: {
             docenti: (await prisma.docente.findMany({})).map(docente => { return {

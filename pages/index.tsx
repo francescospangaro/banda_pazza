@@ -23,13 +23,13 @@ export const getServerSideProps = requireAuth(async (ctx) => {
     }
 })
 
-const Home: NextPage<Props> = (props) => {
+const Home: NextPage<Props> = () => {
     const [currentDate, setCurrentDate] = useState(new Date());
     const {data: lezioni, mutate: mutateLezioni} = useSWR<Lezione[]>(
         '/api/lezioni/' + currentDate.toLocaleDateString(
             'en-US',
             {year: "numeric", month: "numeric", day: "numeric"},
-        ), (url: string) => {
+        ), () => {
             return fetch("/api/lezioni", {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

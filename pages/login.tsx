@@ -55,6 +55,7 @@ export default function Login() {
                     />
                 </div>
             </div>
+            {/* eslint-disable-next-line react/no-unknown-property */}
             <style jsx>{`
         .login {
           flex: 1 1 auto;

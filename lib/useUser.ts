@@ -24,7 +24,7 @@ export default function useUser({
         ) {
             Router.push(redirectTo)
         }
-    }, [user, redirectIfFound, redirectTo])
+    }, [user, swrResponse.isValidating, redirectIfFound, redirectTo])
 
     return {
         user: user,

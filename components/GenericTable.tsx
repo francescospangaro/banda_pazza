@@ -1,5 +1,5 @@
 import React from "react";
-import {useTable, useSortBy, Column, TableOptions} from "react-table";
+import {useTable, useSortBy, TableOptions} from "react-table";
 import {Table, Thead, Tbody, Tr, Th, Td} from "react-super-responsive-table";
 import {Row} from "react-bootstrap";
 import useMediaQuery from "@restart/hooks/useMediaQuery";

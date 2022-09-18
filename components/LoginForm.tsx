@@ -32,6 +32,7 @@ export default function LoginForm({
                 )}
             </Form.Group>
 
+            {/* eslint-disable-next-line */}
             <style jsx>{`
         .error {
           color: brown;

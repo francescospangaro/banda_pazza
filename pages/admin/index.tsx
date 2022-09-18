@@ -24,7 +24,7 @@ type Props = {
     }[],
 }
 
-export const getServerSideProps = requireAuth<Props>(async (ctx) => {
+export const getServerSideProps = requireAuth<Props>(async () => {
     return {
         props: {
             docenti: (await prisma.docente.findMany({})).map(d => { return {
@@ -58,7 +58,7 @@ const Home: NextPage<Props> = (props) => {
 
     const {data: lezioni, mutate: mutateLezioni, isValidating} = useSWR<Lezione[]>(
         ['/api/admin/lezioni', filter],
-        (url: string) => {
+        () => {
             return fetch("/api/admin/lezioni", {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -194,7 +194,7 @@ const Home: NextPage<Props> = (props) => {
                              });
 
                              if(res.ok) {
-                                 mutateLezioni();
+                                 await mutateLezioni();
                                  return {success: true, errMsg: ''};
                              }
 
@@ -221,7 +221,7 @@ const Home: NextPage<Props> = (props) => {
                              });
 
                              if(res.ok) {
-                                 mutateLezioni();
+                                 await mutateLezioni();
                                  return {success: true, errMsg: ''};
                              }
 
