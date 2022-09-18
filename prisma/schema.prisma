@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
 }
 
 datasource db {
@@ -16,22 +17,12 @@ model Docente {
     nome            String
     cognome         String
     email           String      @unique
-    solfeggio       Boolean     @default(false)
     alunni          Alunno[]
     admin           Boolean     @default(false)
     password        String
     lezioni         Lezione[]
-    oreDiLavoro     Int         @default(0)
-    oreRecuperare   Int         @default(0)
-}
-
-model LezioneSolfeggio {
-    id              Int      @id @default(autoincrement())
-    docente         Docente  @relation(fields: [docenteId], references: [id])
-    docenteId       Int
-    alunni          Alunno[]
-    orario          DateTime
-    note            String?
+//    oreDiLavoro     Int         @default(0)
+//    oreRecuperare   Int         @default(0)
 }
 
 model Alunno {
@@ -39,7 +30,7 @@ model Alunno {
     cf             String  @unique
     nome           String
     cognome        String
-    email          String
+    email          String  @unique
     docente        Docente @relation(fields: [docenteId], references: [id])
     docenteId      Int
     annoCorso      Int
@@ -51,13 +42,16 @@ model Lezione {
     id             Int       @id @default(autoincrement())
     docente        Docente   @relation(fields: [docenteId], references: [id])
     docenteId      Int
-    alunno         Alunno    @relation(fields: [alunnoId], references: [id])
-    alunnoId       Int
+    alunni         Alunno[]
     orarioDiInizio DateTime
     orarioDiFine   DateTime
     libretto       Libretto?
     note           String?
-    daRecuperare   Int      @default(0)
+    recuperoId     Int?      @unique
+    recupero       Lezione?  @relation("LezioneDiRecupero", fields: [recuperoId], references: [id])
+    recuperata     Lezione?  @relation("LezioneDiRecupero")
+
+    @@unique([docenteId, orarioDiInizio, orarioDiFine])
 }
 
 enum Libretto {

@@ -2,21 +2,25 @@ import { withIronSessionApiRoute } from 'iron-session/next'
 import { sessionOptions } from '../../../lib/session'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '../../../lib/database'
+import {Libretto} from '../lezioni'
 
+export {Libretto} from "../lezioni"
 export type Lezione = {
     id: number,
-    alunno: {
+    alunni: {
         id: number,
-        nome: string;
-        cognome: string;
-    },
+        nome: string,
+        cognome: string,
+    }[],
     docente: {
         id: number,
-        nome: string;
-        cognome: string;
+        nome: string,
+        cognome: string,
     },
-    orarioDiInizio: Date;
-    orarioDiFine: Date;
+    orarioDiInizio: Date,
+    orarioDiFine: Date,
+    libretto?: Libretto | null,
+    note?: string,
 }
 
 async function lezioniRoute(req: NextApiRequest, res: NextApiResponse<Lezione[]>) {
@@ -40,14 +44,16 @@ async function lezioniRoute(req: NextApiRequest, res: NextApiResponse<Lezione[]>
                 nome: docente.nome ? { contains: docente.nome } : undefined,
                 cognome: docente.cognome ? { contains: docente.cognome } : undefined,
             } : undefined,
-            alunno: alunno.nome || alunno.cognome ? {
-                nome: alunno.nome ? { contains: alunno.nome } : undefined,
-                cognome: alunno.cognome ? { contains: alunno.cognome } : undefined,
+            alunni: alunno.nome || alunno.cognome ? {
+                some: {
+                    nome: alunno.nome ? { contains: alunno.nome } : undefined,
+                    cognome: alunno.cognome ? { contains: alunno.cognome } : undefined,
+                },
             } : undefined,
             orarioDiInizio: { gte: startDate },
             orarioDiFine: { lte: endDate }
         },
-        include: { docente: true, alunno: true },
+        include: { docente: true, alunni: true },
         orderBy: [{ orarioDiInizio: 'asc' }],
     });
 
@@ -59,15 +65,17 @@ async function lezioniRoute(req: NextApiRequest, res: NextApiResponse<Lezione[]>
                 nome: lezione.docente.nome,
                 cognome: lezione.docente.cognome,
             },
-            alunno: {
-                id: lezione.alunnoId,
-                nome: lezione.alunno.nome,
-                cognome: lezione.alunno.cognome,
-            },
+            alunni: lezione.alunni.map(alunno => { return {
+                id: alunno.id,
+                nome: alunno.nome,
+                cognome: alunno.cognome,
+            }}),
             orarioDiInizio: lezione.orarioDiInizio,
             orarioDiFine: lezione.orarioDiFine,
+            libretto: lezione.libretto ?? undefined,
+            note: lezione.note ?? undefined,
         }
-    }))
+    }));
 }
 
 export default withIronSessionApiRoute(lezioniRoute, sessionOptions)

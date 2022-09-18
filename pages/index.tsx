@@ -5,14 +5,11 @@ import {User} from "./api/user";
 import React, {useState} from "react";
 import Layout from "../components/Layout"
 import LezioniTable from "../components/LezioniTable";
-import DatePicker from "react-datepicker";
-import Image from 'next/image';
 
 import requireAuth from "../lib/auth"
 import useSWR from "swr";
 import {Lezione} from "./api/lezioni";
-import {Libretto} from ".prisma/client"
-import {Container, Col, Row, Button} from "react-bootstrap"
+import {Container, Col, Row, Form, Button} from "react-bootstrap"
 
 type Props = {
     docente: User;
@@ -28,7 +25,7 @@ export const getServerSideProps = requireAuth(async (ctx) => {
 
 const Home: NextPage<Props> = (props) => {
     const [currentDate, setCurrentDate] = useState(new Date());
-    const {data: lezioni} = useSWR<Lezione[]>(
+    const {data: lezioni, mutate: mutateLezioni} = useSWR<Lezione[]>(
         '/api/lezioni/' + currentDate.toLocaleDateString(
             'en-US',
             {year: "numeric", month: "numeric", day: "numeric"},
@@ -56,31 +53,71 @@ const Home: NextPage<Props> = (props) => {
                 }
             }));
         });
+    const {data: lezioniDaRecuperare, mutate: mutateLezioniDaGiustificare} = useSWR<Lezione[]>(
+        '/api/lezioni-da-giustificare',
+        (url: string) => {
+            return fetch(url, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+            }).then(r => r.json()).then(lezioni => lezioni.map((lezione: any) => {
+                return {
+                    ...lezione,
+                    orarioDiInizio: new Date(lezione.orarioDiInizio),
+                    orarioDiFine: new Date(lezione.orarioDiFine),
+                }
+            }));
+        });
 
     return (
         <Layout requiresAuth loading={!lezioni}>
             <Container fluid className={styles.container}>
                 <main className={styles.main}>
-                    <Row className="gap-3 mb-3 align-items-center">
+                    {(lezioniDaRecuperare?.length ?? 0) > 0 && (
+                        <Row className="align-items-center">
+                            <div className="alert alert-danger" role="alert">
+                                Hai lezioni da recuperare!
+                            </div>
+                        </Row>
+                    )}
+                    <Row className="gap-3 mb-3 w-100">
                         <Col xs="12" md="auto">
-                            <DatePicker className="w-100" selected={currentDate} onChange={(target: Date) => {setCurrentDate(target)}} />
+                            <Form.Control type="date"
+                                          value={currentDate?.toLocaleDateString(
+                                              'en-CA',
+                                              {year: "numeric", month: "2-digit", day: "2-digit"},
+                                          )}
+                                          className="w-100"
+                                          onChange={(e) => {
+                                              setCurrentDate(new Date(e.currentTarget.value));
+                                          }} />
+                        </Col>
+                        <Col xs="12" md="auto" className="ms-auto">
+                            <Button className="w-100"
+                                    disabled= {(lezioniDaRecuperare?.length ?? 0) <= 0}
+                            >
+                                Recupera
+                            </Button>
                         </Col>
                     </Row>
-                    <Row className="align-items-center">
-                        <div className="alert alert-danger" role="alert">
-                            Hai lezioni da recuperare!
-                        </div>
-                    </Row>
-                    <LezioniTable content={lezioni?.map(lezione => {
-                        return {
-                            nome: lezione.alunno.nome,
-                            cognome: lezione.alunno.cognome,
-                            orarioDiInizio: lezione.orarioDiInizio,
-                            orarioDiFine: lezione.orarioDiFine,
-                            risultato: Libretto.PRESENTE,
-                            note: '',
+                    <LezioniTable scrollable content={lezioni ?? []} onEditLezione={async (editedLezioneFields) => {
+                        const res = await fetch('/api/lezioni', {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(editedLezioneFields)
+                        });
+
+                        if(res.ok) {
+                            await mutateLezioni();
+                            await mutateLezioniDaGiustificare();
+                            return {success: true, errMsg: ''};
                         }
-                    }) ?? []} />
+
+                        if(res.status === 404)
+                            return { success: false, errMsg: "Impossibile trovare la lezione" };
+                        if(res.status === 400)
+                            return { success: false, errMsg: "Parametri non validi" };
+                        return { success: false, errMsg: "Errore non previsto" };
+                    }} />
                 </main>
             </Container>
         </Layout>

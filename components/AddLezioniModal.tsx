@@ -1,12 +1,6 @@
-import {Modal, Form, Button, Col, InputGroup} from "react-bootstrap"
+import {Modal, Form, Button, Row, Col, InputGroup} from "react-bootstrap"
 import {useState} from "react";
-
-type GeneratedLezione = {
-    docenteId: number,
-    alunnoId: number,
-    orario: Date,
-    durataInMin: number,
-}
+import {LezioneToGenerate as GeneratedLezione} from "../pages/api/admin/lezione"
 
 type Props = {
     docenti: {
@@ -22,7 +16,8 @@ type Props = {
     handleSubmit: (lezioni: GeneratedLezione[]) => Promise<{ success: boolean, errMsg?: string }>,
 }
 
-export default function AddLezioniModal({ docenti, alunni, show, handleClose, handleSubmit }: Props) {
+export default function AddLezioniModal({ docenti, alunni: allAlunni, show, handleClose, handleSubmit }: Props) {
+    const [alunni, setAlunni] = useState([null] as (string | null)[]);
     const [errorMsg, setErrMsg] = useState('');
     const [executing, setExecuting] = useState(false);
 
@@ -30,6 +25,7 @@ export default function AddLezioniModal({ docenti, alunni, show, handleClose, ha
     handleClose = () => {
         if(!executing) {
             _handleClose();
+            setAlunni([null]);
             setErrMsg('');
         }
     };
@@ -53,8 +49,8 @@ export default function AddLezioniModal({ docenti, alunni, show, handleClose, ha
                 endDate.setHours(Number(hour), Number(minutes));
                 do {
                     lessons.push({
-                        docenteId: e.currentTarget.docente.value,
-                        alunnoId: e.currentTarget.alunno.value,
+                        docenteId: Number(e.currentTarget.docente.value),
+                        alunniIds: alunni.map(alunno => Number(alunno)),
                         orario: new Date(startDate),
                         durataInMin: Number(e.currentTarget.durata.value),
                     });
@@ -83,15 +79,52 @@ export default function AddLezioniModal({ docenti, alunni, show, handleClose, ha
                             </Form.Select>
                         </Col>
                         <Col xs="12">
-                            <Form.Label>Alunno</Form.Label>
-                            <Form.Select required name="alunno">
-                                <>
-                                    <option></option>
-                                    {alunni.map(alunno => {
-                                        return <option key={alunno.id} value={alunno.id}>{alunno.fullName}</option>
-                                    })}
-                                </>
-                            </Form.Select>
+                            <Row className="g-1">
+                                <Col xs="auto"><Form.Label>Alunni</Form.Label></Col>
+                                <Col xs="auto" className="ms-auto">
+                                    <Button variant="primary"
+                                            size="sm"
+                                            onClick={() => { setAlunni(alunni => [...alunni, null])}}
+                                    >
+                                        Aggiungi
+                                    </Button>
+                                </Col>
+                            </Row>
+                            <Row className="g-1 mt-1">
+                                {alunni.map((alunno, idx) => (
+                                    <Col key={idx} xs="12">
+                                        <InputGroup>
+                                            <Button variant="outline-secondary"
+                                                    onClick={() => { setAlunni(alunni => {
+                                                        if(alunni.length <= 1)
+                                                            return alunni;
+
+                                                        const newAlunni = [...alunni];
+                                                        newAlunni.splice(idx, 1);
+                                                        return newAlunni;
+                                                    })}}
+                                            >
+                                                Rimuovi
+                                            </Button>
+                                            <Form.Select required
+                                                         value={alunno ?? ""}
+                                                         onChange={(e) => setAlunni(alunni => {
+                                                             const newAlunni = [...alunni];
+                                                             newAlunni[idx] = e.target.value;
+                                                             return newAlunni;
+                                                         })}
+                                            >
+                                                <>
+                                                    <option value=""></option>
+                                                    {allAlunni.map(alunno => {
+                                                        return <option key={alunno.id} value={alunno.id}>{alunno.fullName}</option>
+                                                    })}
+                                                </>
+                                            </Form.Select>
+                                        </InputGroup>
+                                    </Col>
+                                ))}
+                            </Row>
                         </Col>
                         <Col xs="12" md="6">
                             <Form.Label>Prima lezione</Form.Label>

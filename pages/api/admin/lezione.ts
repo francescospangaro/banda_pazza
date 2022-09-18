@@ -4,7 +4,7 @@ import {NextApiRequest, NextApiResponse} from 'next'
 import { prisma } from '../../../lib/database'
 
 export type LezioneToGenerate = {
-    alunnoId: number,
+    alunniIds: number[],
     docenteId: number,
     orario: Date,
     durataInMin: number,
@@ -16,75 +16,80 @@ async function lezioneRoute(req: NextApiRequest, res: NextApiResponse) {
         return res.status(401).end();
 
     if(req.method === 'POST') {
-        const lessons = (await req.body) as LezioneToGenerate[];
-        if (!lessons)
+        const body = await req.body;
+        if (!body)
             return res.status(400).end();
 
-        const databaseLessons = lessons.map(lezione => {
-            return {
-                docenteId: Number(lezione.docenteId),
-                alunnoId: Number(lezione.alunnoId),
-                orarioDiInizio: new Date(lezione.orario),
-                orarioDiFine: (() => {
-                    const orarioDiFine = new Date(lezione.orario);
-                    orarioDiFine.setMinutes(orarioDiFine.getMinutes() + Number(lezione.durataInMin));
-                    return orarioDiFine
-                })(),
-            }
-        });
+        const lezioni = (body as LezioneToGenerate[]).map(lezione => { return {
+            alunniIds: lezione.alunniIds.map(id => Number(id)),
+            docenteId: Number(lezione.docenteId),
+            orarioDiInizio: new Date(lezione.orario),
+            orarioDiFine: (() => {
+                const orarioDiFine = new Date(lezione.orario);
+                orarioDiFine.setMinutes(orarioDiFine.getMinutes() + Number(lezione.durataInMin));
+                return orarioDiFine
+            })(),
+        }});
+        const alunniToLezioni = Array.from(lezioni.reduce((map, lezione) => {
+            lezione.alunniIds.forEach(alunnoId => {
+                if(!map.get(alunnoId))
+                    map.set(alunnoId, []);
+                map.get(alunnoId)!.push({
+                    docenteId: lezione.docenteId,
+                    orarioDiInizio: lezione.orarioDiInizio,
+                    orarioDiFine: lezione.orarioDiFine,
+                });
+            })
+            return map;
+        }, new Map<number, { docenteId: number, orarioDiInizio: Date, orarioDiFine: Date, }[]>()).entries());
 
-        const dupes = await prisma.lezione.aggregate({
-            where: {
-                OR: databaseLessons.flatMap(lezione => {
-                    return [
-                        {
-                            AND: [
-                                {orarioDiInizio: {lt: lezione.orarioDiInizio}},
-                                {orarioDiFine: {gt: lezione.orarioDiInizio}}]
-                        },
-                        {
-                            AND: [
-                                {orarioDiInizio: {lt: lezione.orarioDiFine}},
-                                {orarioDiFine: {gt: lezione.orarioDiFine}}]
-                        },
-                    ]
-                })
-            },
-            _count: {id: true},
-        });
-
-        const count = dupes._count.id;
-        if (count > 0) {
-            res.status(400).json({
-                err: {
-                    type: "overlap",
-                    count: count,
-                    first: (await prisma.lezione.findMany({
-                        where: {
-                            OR: databaseLessons.flatMap(lezione => {
-                                return [
-                                    {
-                                        AND: [
-                                            {orarioDiInizio: {lte: lezione.orarioDiInizio}},
-                                            {orarioDiFine: {gte: lezione.orarioDiInizio}}]
-                                    },
-                                    {
-                                        AND: [
-                                            {orarioDiInizio: {lte: lezione.orarioDiFine}},
-                                            {orarioDiFine: {gte: lezione.orarioDiFine}}]
-                                    },
-                                ]
-                            })
-                        },
-                        take: 1,
-                    }))[0],
-                }
+        await prisma.$transaction(async (tx) => {
+            const dupesWhereClause = { OR: lezioni.flatMap(lezione => { return {AND: [
+                        { OR: [
+                                {docenteId: lezione.docenteId},
+                                {alunni: {some: {id: {in: lezione.alunniIds}}}}] },
+                        {NOT: [{orarioDiFine: lezione.orarioDiInizio}]},
+                        {NOT: [{orarioDiInizio: lezione.orarioDiFine}]},
+                        {OR: [
+                                {AND: [
+                                        {orarioDiInizio: {lte: lezione.orarioDiInizio}},
+                                        {orarioDiFine: {gte: lezione.orarioDiInizio}}]},
+                                {AND: [
+                                        {orarioDiInizio: {lte: lezione.orarioDiFine}},
+                                        {orarioDiFine: {gte: lezione.orarioDiFine}}]}
+                            ]}
+                    ]}})};
+            const dupes = await tx.lezione.aggregate({
+                where: dupesWhereClause,
+                _count: {id: true},
             });
-            return;
-        }
 
-        await prisma.lezione.createMany({data: databaseLessons});
-        res.status(200).end();
+            const count = dupes._count.id;
+            if (count > 0)
+                return res.status(400).json({
+                    err: {
+                        type: "overlap",
+                        count: count,
+                        first: (await tx.lezione.findMany({
+                            where: dupesWhereClause,
+                            take: 1,
+                        }))[0],
+                    }
+                });
+
+            await Promise.all(alunniToLezioni.map(([alunnoId, lezioniIn]) => tx.alunno.update({
+                data: {
+                    lezioni: {
+                        connectOrCreate: lezioniIn.map(lezione => { return {
+                            where: {docenteId_orarioDiInizio_orarioDiFine: lezione},
+                            create: lezione,
+                        }})
+                    }
+                },
+                where: { id: alunnoId },
+            })));
+            res.status(200).end();
+        });
     } else if(req.method === 'DELETE') {
         const lessons = await req.body;
         if (!lessons)

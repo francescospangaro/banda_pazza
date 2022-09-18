@@ -9,7 +9,6 @@ import LezioniAdvancedTable from "../../components/LezioniAdvancedTable";
 import requireAuth from "../../lib/auth"
 import useSWR from "swr";
 import {Lezione} from "../api/admin/lezioni";
-import {Libretto} from ".prisma/client"
 import {Container, Col, Row, Form, Button} from "react-bootstrap"
 import AddLezioniModal from "../../components/AddLezioniModal";
 import DeleteLezioniModal from "../../components/DeleteLezioniModal";
@@ -135,30 +134,40 @@ const Home: NextPage<Props> = (props) => {
                         </Form>
                     </Row>
 
-                    <LezioniAdvancedTable scrollable content={lezioni?.map(lezione => {
-                        return {
-                            id: lezione.id,
-                            docente: lezione.docente.nome + ' ' + lezione.docente.cognome,
-                            docenteId: lezione.docente.id,
-                            alunno: lezione.alunno.nome + ' ' + lezione.alunno.cognome,
-                            alunnoId: lezione.alunno.id,
-                            orarioDiInizio: lezione.orarioDiInizio,
-                            orarioDiFine: lezione.orarioDiFine,
-                            risultato: Libretto.PRESENTE,
-                            note: '',
-                            selectable: true,
-                            selected: selectedLezioni.has(lezione.id),
-                        }
-                    }) ?? []} onSelectLezione={(lezione, selected) => {
-                        setSelectedLezioni(lezioni => {
-                            const newLezioni = new Set(lezioni);
-                            if(selected)
-                                newLezioni.add(lezione.id);
-                            else
-                                newLezioni.delete(lezione.id);
-                            return newLezioni;
-                        })
-                    }} />
+                    <LezioniAdvancedTable scrollable
+                                          content={lezioni?.map(lezione => { return {
+                                              ...lezione,
+                                              selectable: true,
+                                              selected: selectedLezioni.has(lezione.id),
+                                          }}) ?? []}
+                                          onSelectLezione={(lezione, selected) => {
+                                              setSelectedLezioni(lezioni => {
+                                                  const newLezioni = new Set(lezioni);
+                                                  if(selected)
+                                                      newLezioni.add(lezione.id);
+                                                  else
+                                                      newLezioni.delete(lezione.id);
+                                                  return newLezioni;
+                                              })
+                                          }}
+                                          onEditLezione={async (editedLezioneFields) => {
+                                              const res = await fetch('/api/lezioni', {
+                                                  method: 'PUT',
+                                                  headers: { 'Content-Type': 'application/json' },
+                                                  body: JSON.stringify(editedLezioneFields)
+                                              });
+
+                                              if(res.ok) {
+                                                  await mutateLezioni();
+                                                  return {success: true, errMsg: ''};
+                                              }
+
+                                              if(res.status === 404)
+                                                  return { success: false, errMsg: "Impossibile trovare la lezione" };
+                                              if(res.status === 400)
+                                                  return { success: false, errMsg: "Parametri non validi" };
+                                              return { success: false, errMsg: "Errore non previsto" };
+                                          }} />
 
                     <Row className="mb-3 w-100 justify-content-center flex-grow-0 flex-shrink-1">
                         <Col className="col-md-auto col-12 mb-3">

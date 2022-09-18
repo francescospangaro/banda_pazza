@@ -1,42 +1,56 @@
 import React, {useMemo} from "react";
 import GenericTable from "./GenericTable"
-import {Libretto} from ".prisma/client"
 import {Form} from "react-bootstrap";
-import {CellProps, Column} from "react-table";
+import {Column} from "react-table";
+import {Lezione, Libretto} from "../pages/api/admin/lezioni"
 
-export type Lezione = {
+type TableLezione = {
+    in: Lezione,
     id: number,
     docente: string,
     docenteId: number,
-    alunno: string,
-    alunnoId: number,
+    alunni: string,
     orarioDiInizio: Date,
     orarioDiFine: Date,
-    risultato: Libretto,
-    note: string,
+    libretto?: Libretto | null,
+    note?: string,
     selectable: boolean,
     selected: boolean,
 }
 
 type Props = {
-    content: Lezione[]
+    content: (Lezione & { selectable: boolean, selected: boolean, })[]
     onSelectLezione?: (lezione: Lezione, selected: boolean) => void,
+    onEditLezione?: (editedLezioniField: { id: number } & Partial<Lezione>) => Promise<any>,
     scrollable?: boolean,
 }
 
-export default function LezioniAdvancedTable({content, onSelectLezione, scrollable}: Props) {
-    const columns = useMemo<Column<Lezione>[]>(
+export default function LezioniAdvancedTable({content, onSelectLezione, onEditLezione, scrollable}: Props) {
+    const tableData = content.map(lezione => { return {
+        in: lezione,
+        id: lezione.id,
+        docente: lezione.docente.nome + ' ' + lezione.docente.cognome,
+        docenteId: lezione.docente.id,
+        alunni: lezione.alunni.map(alunno => alunno.nome + ' ' + alunno.cognome).join(', '),
+        orarioDiInizio: lezione.orarioDiInizio,
+        orarioDiFine: lezione.orarioDiFine,
+        libretto: lezione.libretto,
+        note: lezione.note,
+        selectable: lezione.selectable,
+        selected: lezione.selected,
+    }});
+    const columns = useMemo<Column<TableLezione>[]>(
         () => [
             {
                 accessor: "selected",
-                Cell: (props: CellProps<Lezione>) => {
+                Cell: (props) => {
                     return <Form.Check
                         disabled={!props.row.original.selectable}
                         checked={props.row.original.selected}
                         type="checkbox"
                         label=""
                         onChange={(e) => {
-                            if(onSelectLezione) onSelectLezione(props.row.original, e.target.checked);
+                            if(onSelectLezione) onSelectLezione(props.row.original.in, e.target.checked);
                         }}/>
                 },
             },
@@ -60,41 +74,63 @@ export default function LezioniAdvancedTable({content, onSelectLezione, scrollab
             },
             {
                 Header: "Alunno",
-                accessor: "alunno",
+                accessor: "alunni",
             },
             {
                 Header: "Risultato",
-                accessor: "risultato",
-                Cell: () => {
-                    return <select className="w-100">
+                accessor: "libretto",
+                Cell: (props) => {
+                    return <Form.Select className="w-100"
+                                        size="sm"
+                                        value={props.row.original.libretto ?? ''}
+                                        onChange={async (e) => {
+                                            if(onEditLezione)
+                                                await onEditLezione({
+                                                    id: props.row.original.id,
+                                                    libretto: e.target.value === '' ? null : e.target.value as Libretto,
+                                                });
+                                        }}
+                    >
                         <option value="">---</option>
                         <option value="PRESENTE">Presente</option>
                         <option value="ASSENTE_GIUSTIFICATO">Assente Giustificato</option>
                         <option value="ASSENTE_NON_GIUSTIFICATO">Assente non giustificato</option>
                         <option value="LEZIONE_SALTATA">Lezione saltata</option>
-                    </select>;
+                    </Form.Select>;
                 },
             },
             {
                 Header: "Note",
                 accessor: "note",
-                Cell: () => {
-                    return <textarea className="w-100" style={{
-                        resize: "vertical"
-                    }}></textarea>;
+                Cell: (props) => {
+                    return <Form.Control as="textarea"
+                                         rows={1}
+                                         className="w-100"
+                                         style={{resize: "vertical"}}
+                                         size="sm"
+                                         onChange={async (e) => {
+                                             if(onEditLezione)
+                                                 await onEditLezione({
+                                                     id: props.row.original.id,
+                                                     note: e.target.value,
+                                                 });
+                                         }}
+                    >
+                        {props.row.original.note}
+                    </Form.Control>;
                 },
             },
         ],
-        [onSelectLezione]
+        [onSelectLezione, onEditLezione]
     );
 
     return (
-        <GenericTable<Lezione> options={{
+        <GenericTable<TableLezione> options={{
             initialState: {
                 sortBy: [{ id: "orarioDiInizio", }],
             },
             columns,
-            data: content,
+            data: tableData,
             autoResetHiddenColumns: false,
             scrollable: scrollable,
         }} />
