@@ -68,6 +68,16 @@ const Home: NextPage<Props> = (props) => {
                     ...lezione,
                     orarioDiInizio: new Date(lezione.orarioDiInizio),
                     orarioDiFine: new Date(lezione.orarioDiFine),
+                    recuperataDa: lezione.recuperataDa ? {
+                        ...lezione.recuperataDa,
+                        orarioDiInizio: new Date(lezione.recuperataDa.orarioDiInizio),
+                        orarioDiFine: new Date(lezione.recuperataDa.orarioDiFine),
+                    } : undefined,
+                    recuperoDi: lezione.recuperoDi ? {
+                        ...lezione.recuperoDi,
+                        orarioDiInizio: new Date(lezione.recuperoDi.orarioDiInizio),
+                        orarioDiFine: new Date(lezione.recuperoDi.orarioDiFine),
+                    } : undefined,
                 }
             }));
         });

@@ -10,6 +10,7 @@ import requireAuth from "../lib/auth"
 import useSWR from "swr";
 import {Lezione} from "./api/lezioni";
 import {Container, Col, Row, Form, Button} from "react-bootstrap"
+import RecuperaLezioneModal from "../components/RecuperaLezioniModal";
 
 type Props = {
     docente: User;
@@ -25,6 +26,7 @@ export const getServerSideProps = requireAuth(async (ctx) => {
 
 const Home: NextPage<Props> = () => {
     const [currentDate, setCurrentDate] = useState(new Date());
+    const [showRecuperiModal, setShowRecuperiModal] = useState(false);
     const {data: lezioni, mutate: mutateLezioni} = useSWR<Lezione[]>(
         '/api/lezioni/' + currentDate.toLocaleDateString(
             'en-US',
@@ -50,6 +52,16 @@ const Home: NextPage<Props> = () => {
                     ...lezione,
                     orarioDiInizio: new Date(lezione.orarioDiInizio),
                     orarioDiFine: new Date(lezione.orarioDiFine),
+                    recuperataDa: lezione.recuperataDa ? {
+                        ...lezione.recuperataDa,
+                        orarioDiInizio: new Date(lezione.recuperataDa.orarioDiInizio),
+                        orarioDiFine: new Date(lezione.recuperataDa.orarioDiFine),
+                    } : undefined,
+                    recuperoDi: lezione.recuperoDi ? {
+                        ...lezione.recuperoDi,
+                        orarioDiInizio: new Date(lezione.recuperoDi.orarioDiInizio),
+                        orarioDiFine: new Date(lezione.recuperoDi.orarioDiFine),
+                    } : undefined,
                 }
             }));
         });
@@ -68,7 +80,7 @@ const Home: NextPage<Props> = () => {
             }));
         });
 
-    return (
+    return <>
         <Layout requiresAuth loading={!lezioni}>
             <Container fluid className={styles.container}>
                 <main className={styles.main}>
@@ -94,6 +106,7 @@ const Home: NextPage<Props> = () => {
                         <Col xs="12" md="auto" className="ms-auto">
                             <Button className="w-100"
                                     disabled= {(lezioniDaRecuperare?.length ?? 0) <= 0}
+                                    onClick={() => setShowRecuperiModal(true)}
                             >
                                 Recupera
                             </Button>
@@ -121,7 +134,29 @@ const Home: NextPage<Props> = () => {
                 </main>
             </Container>
         </Layout>
-    );
+
+        <RecuperaLezioneModal show={showRecuperiModal}
+                              handleClose={() => setShowRecuperiModal(false)}
+                              lezioniDaRecuperare={lezioniDaRecuperare ?? []}
+                              handleSubmit={async (lezioneGiustificata) => {
+                                  console.log(lezioneGiustificata);
+                                  const res = await fetch('/api/lezioni-da-giustificare', {
+                                      method: 'POST',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify(lezioneGiustificata)
+                                  });
+
+                                  if(res.ok) {
+                                      await mutateLezioni();
+                                      await mutateLezioniDaGiustificare();
+                                      return {success: true, errMsg: ''};
+                                  }
+
+                                  if(res.status === 400)
+                                      return { success: false, errMsg: "Parametri non validi" };
+                                  return { success: false, errMsg: "Errore non previsto" };
+                              }} />
+    </>;
 }
 
 export default Home

@@ -20,7 +20,8 @@ export type Lezione = {
     orarioDiInizio: Date,
     orarioDiFine: Date,
     libretto?: Libretto | null,
-    note?: string,
+    recuperataDa?: {id: number, orarioDiInizio: Date, orarioDiFine: Date},
+    recuperoDi?: {id: number, orarioDiInizio: Date, orarioDiFine: Date},
 }
 
 async function lezioniRoute(req: NextApiRequest, res: NextApiResponse<Lezione[]>) {
@@ -38,7 +39,7 @@ async function lezioniRoute(req: NextApiRequest, res: NextApiResponse<Lezione[]>
                 docenteId: user.id,
                 orarioDiInizio: { lte: to, gte: from },
             },
-            include: { alunni: true },
+            include: {alunni: true, recuperataDa: true, recuperoDi: true},
             orderBy: [{ orarioDiInizio: 'asc' }],
         });
 
@@ -52,23 +53,37 @@ async function lezioniRoute(req: NextApiRequest, res: NextApiResponse<Lezione[]>
                 orarioDiInizio: lezione.orarioDiInizio,
                 orarioDiFine: lezione.orarioDiFine,
                 libretto: lezione.libretto ?? undefined,
-                note: lezione.note ?? undefined,
+                recuperataDa: lezione.recuperataDa ? {
+                    id: lezione.recuperataDa.id,
+                    orarioDiInizio: lezione.recuperataDa.orarioDiInizio,
+                    orarioDiFine: lezione.recuperataDa.orarioDiFine,
+                } : undefined,
+                recuperoDi: lezione.recuperoDi ? {
+                    id: lezione.recuperoDi.id,
+                    orarioDiInizio: lezione.recuperoDi.orarioDiInizio,
+                    orarioDiFine: lezione.recuperoDi.orarioDiFine,
+                } : undefined,
             }
         }));
     } else if(req.method === 'PUT') {
-        const { id, libretto, note } = await req.body;
+        const { id, libretto } = await req.body;
         if(!id)
             return res.status(400).end();
 
-        await prisma.lezione.update({
-            data: {
-                libretto: libretto,
-                note: note
-            },
-            where: { id: id, },
-        });
+        (await prisma.$transaction(async tx => {
+            const lezione = await prisma.lezione.findUnique({where: {id: id}, include: {recuperataDa: true}});
+            if(!lezione)
+                return () => res.status(404).end();
+            if(lezione?.recuperataDa && libretto !== undefined)
+                return () => res.status(400).end();
 
-        res.status(200).end();
+            await tx.lezione.update({
+                data: {libretto: libretto},
+                where: { id: id, },
+            });
+
+            return () => res.status(200).end();
+        }))();
     }
 }
 

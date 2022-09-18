@@ -46,10 +46,9 @@ model Lezione {
     orarioDiInizio DateTime
     orarioDiFine   DateTime
     libretto       Libretto?
-    note           String?
     recuperoId     Int?      @unique
-    recupero       Lezione?  @relation("LezioneDiRecupero", fields: [recuperoId], references: [id])
-    recuperata     Lezione?  @relation("LezioneDiRecupero")
+    recuperoDi     Lezione?  @relation("LezioneDiRecupero", fields: [recuperoId], references: [id])
+    recuperataDa   Lezione?  @relation("LezioneDiRecupero")
 
     @@unique([docenteId, orarioDiInizio, orarioDiFine])
 }

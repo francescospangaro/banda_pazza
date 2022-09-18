@@ -1,5 +1,6 @@
 import React, {useMemo} from "react";
 import GenericTable from "./GenericTable"
+import TextareaAutosize from "react-textarea-autosize"
 import {Form} from "react-bootstrap";
 import {Column} from "react-table";
 import {Lezione, Libretto} from "../pages/api/admin/lezioni"
@@ -14,6 +15,8 @@ type TableLezione = {
     orarioDiFine: Date,
     libretto?: Libretto | null,
     note?: string,
+    recuperataDa?: {id: number, orarioDiInizio: Date, orarioDiFine: Date},
+    recuperoDi?: {id: number, orarioDiInizio: Date, orarioDiFine: Date},
     selectable: boolean,
     selected: boolean,
 }
@@ -35,7 +38,16 @@ export default function LezioniAdvancedTable({content, onSelectLezione, onEditLe
         orarioDiInizio: lezione.orarioDiInizio,
         orarioDiFine: lezione.orarioDiFine,
         libretto: lezione.libretto,
-        note: lezione.note,
+        note: "" +
+            (lezione.recuperoDi ?
+                "Recupero del " + lezione.recuperoDi?.orarioDiInizio.toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit' }) :
+                "") +
+            (lezione.recuperataDa && lezione.recuperoDi ? '\n' : '') +
+            (lezione.recuperataDa ?
+                "Recuperata il " + lezione.recuperataDa?.orarioDiInizio.toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit' }) :
+                ""),
+        recuperataDa: lezione.recuperataDa,
+        recuperoDi: lezione.recuperoDi,
         selectable: lezione.selectable,
         selected: lezione.selected,
     }});
@@ -82,6 +94,7 @@ export default function LezioniAdvancedTable({content, onSelectLezione, onEditLe
                 Cell: (props) => {
                     return <Form.Select className="w-100"
                                         size="sm"
+                                        disabled={!!props.row.original.recuperataDa}
                                         value={props.row.original.libretto ?? ''}
                                         onChange={async (e) => {
                                             if(onEditLezione)
@@ -103,21 +116,10 @@ export default function LezioniAdvancedTable({content, onSelectLezione, onEditLe
                 Header: "Note",
                 accessor: "note",
                 Cell: (props) => {
-                    return <Form.Control as="textarea"
-                                         rows={1}
-                                         className="w-100"
-                                         style={{resize: "vertical"}}
-                                         size="sm"
-                                         onChange={async (e) => {
-                                             if(onEditLezione)
-                                                 await onEditLezione({
-                                                     id: props.row.original.id,
-                                                     note: e.target.value,
-                                                 });
-                                         }}
-                    >
-                        {props.row.original.note}
-                    </Form.Control>;
+                    return <TextareaAutosize disabled
+                                             className="form-control"
+                                             style={{resize: "none"}}
+                                             value={props.row.original.note} />;
                 },
             },
         ],
