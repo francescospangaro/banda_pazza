@@ -80,6 +80,7 @@ export default function Layout({ children, requiresAuth, loading }: {
         .layout-container {
           flex: 1 1 auto;
           max-width: 75rem;
+          width: 100%;
           margin: 1.5rem auto 0 auto;
           padding-left: 1rem;
           padding-right: 1rem;
