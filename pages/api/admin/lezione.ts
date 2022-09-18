@@ -43,7 +43,7 @@ async function lezioneRoute(req: NextApiRequest, res: NextApiResponse) {
             return map;
         }, new Map<number, { docenteId: number, orarioDiInizio: Date, orarioDiFine: Date, }[]>()).entries());
 
-        await prisma.$transaction(async (tx) => {
+        (await prisma.$transaction(async (tx) => {
             const dupesWhereClause = { OR: lezioni.flatMap(lezione => { return {AND: [
                         { OR: [
                                 {docenteId: lezione.docenteId},
@@ -66,7 +66,7 @@ async function lezioneRoute(req: NextApiRequest, res: NextApiResponse) {
 
             const count = dupes._count.id;
             if (count > 0)
-                return res.status(400).json({
+                return async () => res.status(400).json({
                     err: {
                         type: "overlap",
                         count: count,
@@ -88,8 +88,8 @@ async function lezioneRoute(req: NextApiRequest, res: NextApiResponse) {
                 },
                 where: { id: alunnoId },
             })));
-            res.status(200).end();
-        });
+            return () => res.status(200).end();
+        }))();
     } else if(req.method === 'DELETE') {
         const lessons = await req.body;
         if (!lessons)

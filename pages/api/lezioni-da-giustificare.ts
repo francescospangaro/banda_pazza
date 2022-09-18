@@ -43,10 +43,10 @@ async function lezioniRoute(req: NextApiRequest, res: NextApiResponse<Lezione[]>
             return res.status(400).end();
         orarioDiInizio = new Date(orarioDiInizio);
 
-        await prisma.$transaction(async tx => {
+        (await prisma.$transaction(async tx => {
             const lezioneDaRecuperare = await tx.lezione.findUnique({where: {id: idDaRecuperare}, include: { alunni: true}});
             if(!lezioneDaRecuperare)
-                return res.status(404).end();
+                return () => res.status(404).end();
 
             await tx.lezione.create({ data: {
                     docente: {connect: {id: lezioneDaRecuperare.docenteId}},
@@ -60,8 +60,8 @@ async function lezioniRoute(req: NextApiRequest, res: NextApiResponse<Lezione[]>
                     })(),
                     recuperoDi: {connect: {id: lezioneDaRecuperare.id}},
                 }});
-            res.status(200).end();
-        });
+            return () => res.status(200).end();
+        }))();
     }
 }
 
