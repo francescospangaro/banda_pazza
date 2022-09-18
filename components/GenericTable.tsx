@@ -18,12 +18,13 @@ export default function GenericTable<T extends object = {}>({ options }: { optio
                 <Tr>
                     {headerGroups.map((headerGroup) => (
                         headerGroup.headers.map((column) => {
-                            const { key, ...restColumn } = column.getHeaderProps();
+                            const { key, ...restColumn } = column.getHeaderProps(column.getSortByToggleProps({
+                                style: { whiteSpace: "nowrap" }
+                            }));
                             return (
                                 <Th
                                     key={key}
                                     {...restColumn}
-                                    style={{ whiteSpace: "nowrap" }}
                                 >
                                     {column.render("Header")}
                                     <span className="ms-2" style={{ alignSelf: "end" }}>
