@@ -13,6 +13,7 @@ import {Container, Col, Row, Form, Button} from "react-bootstrap"
 import AddLezioniModal from "../../components/AddLezioniModal";
 import DeleteLezioniModal from "../../components/DeleteLezioniModal";
 import FilterModal, {Filter} from "../../components/FilterModal";
+import {isOverlapError} from "../api/admin/lezione";
 
 type Props = {
     docenti: {
@@ -167,10 +168,10 @@ const Home: NextPage<Props> = (props) => {
 
                              if(res.status === 400) {
                                  const { err } = await res.json();
-                                 if(err?.type === 'overlap')
+                                 if(isOverlapError(err))
                                      return {
                                          success: false,
-                                         errMsg: "Ci sono " +  err?.count + " sovrapposizioni",
+                                         errMsg: "Ci sono " +  err.count + " sovrapposizioni",
                                      };
 
                                  return { success: false, errMsg: "Parametri non validi" };

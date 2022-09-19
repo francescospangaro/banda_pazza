@@ -11,6 +11,7 @@ import useSWR from "swr";
 import {Lezione} from "./api/lezioni";
 import {Container, Col, Row, Form, Button} from "react-bootstrap"
 import RecuperaLezioneModal from "../components/RecuperaLezioniModal";
+import {isOverlapError} from "./api/admin/lezione";
 
 type Props = {
     docente: User;
@@ -127,8 +128,19 @@ const Home: NextPage<Props> = () => {
 
                         if(res.status === 404)
                             return { success: false, errMsg: "Impossibile trovare la lezione" };
-                        if(res.status === 400)
+
+                        if(res.status === 400) {
+                            const { err } = await res.json();
+                            if(isOverlapError(err)) {
+                                return {
+                                    success: false,
+                                    errMsg: "Ci sono " + err.count + " sovrapposizioni",
+                                };
+                            }
+
                             return { success: false, errMsg: "Parametri non validi" };
+                        }
+
                         return { success: false, errMsg: "Errore non previsto" };
                     }} />
                 </main>

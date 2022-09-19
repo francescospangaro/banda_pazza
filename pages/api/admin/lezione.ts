@@ -1,7 +1,7 @@
 import {withIronSessionApiRoute} from 'iron-session/next'
 import {sessionOptions} from '../../../lib/session'
 import {NextApiRequest, NextApiResponse} from 'next'
-import { prisma } from '../../../lib/database'
+import {prisma} from '../../../lib/database'
 
 export type LezioneToGenerate = {
     alunniIds: number[],
@@ -10,7 +10,44 @@ export type LezioneToGenerate = {
     durataInMin: number,
 }
 
-async function lezioneRoute(req: NextApiRequest, res: NextApiResponse) {
+export type OverlapError = {
+    type: "overlap",
+    count: number,
+    first: {
+        docenteId: number,
+        orarioDiInizio: Date,
+        orarioDiFine: Date,
+    },
+}
+
+export function isOverlapError(err: any): err is OverlapError {
+    return err && (err as OverlapError).type === "overlap";
+}
+
+export function createDupesWhereClause(lezioni: {
+    alunniIds: number[],
+    docenteId: number,
+    orarioDiInizio: Date,
+    orarioDiFine: Date,
+}[]) {
+    return { OR: lezioni.flatMap(lezione => { return {AND: [
+                { OR: [
+                        {docenteId: lezione.docenteId},
+                        {alunni: {some: {id: {in: lezione.alunniIds}}}}] },
+                {NOT: [{orarioDiFine: lezione.orarioDiInizio}]},
+                {NOT: [{orarioDiInizio: lezione.orarioDiFine}]},
+                {OR: [
+                        {AND: [
+                                {orarioDiInizio: {lte: lezione.orarioDiInizio}},
+                                {orarioDiFine: {gte: lezione.orarioDiInizio}}]},
+                        {AND: [
+                                {orarioDiInizio: {lte: lezione.orarioDiFine}},
+                                {orarioDiFine: {gte: lezione.orarioDiFine}}]}
+                    ]}
+            ]}})};
+}
+
+async function lezioneRoute(req: NextApiRequest, res: NextApiResponse<{err: OverlapError} | void>) {
     const user = req.session.user;
     if (!user || user?.isLoggedIn !== true || user?.admin !== true)
         return res.status(401).end();
@@ -44,21 +81,7 @@ async function lezioneRoute(req: NextApiRequest, res: NextApiResponse) {
         }, new Map<number, { docenteId: number, orarioDiInizio: Date, orarioDiFine: Date, }[]>()).entries());
 
         (await prisma.$transaction(async (tx) => {
-            const dupesWhereClause = { OR: lezioni.flatMap(lezione => { return {AND: [
-                        { OR: [
-                                {docenteId: lezione.docenteId},
-                                {alunni: {some: {id: {in: lezione.alunniIds}}}}] },
-                        {NOT: [{orarioDiFine: lezione.orarioDiInizio}]},
-                        {NOT: [{orarioDiInizio: lezione.orarioDiFine}]},
-                        {OR: [
-                                {AND: [
-                                        {orarioDiInizio: {lte: lezione.orarioDiInizio}},
-                                        {orarioDiFine: {gte: lezione.orarioDiInizio}}]},
-                                {AND: [
-                                        {orarioDiInizio: {lte: lezione.orarioDiFine}},
-                                        {orarioDiFine: {gte: lezione.orarioDiFine}}]}
-                            ]}
-                    ]}})};
+            const dupesWhereClause = createDupesWhereClause(lezioni);
             const dupes = await tx.lezione.aggregate({
                 where: dupesWhereClause,
                 _count: {id: true},
@@ -70,10 +93,18 @@ async function lezioneRoute(req: NextApiRequest, res: NextApiResponse) {
                     err: {
                         type: "overlap",
                         count: count,
-                        first: (await tx.lezione.findMany({
-                            where: dupesWhereClause,
-                            take: 1,
-                        }))[0],
+                        first: await (async () => {
+                            const overlappingLesson = (await tx.lezione.findMany({
+                                where: dupesWhereClause,
+                                take: 1,
+                            }))[0];
+
+                            return {
+                                docenteId: overlappingLesson.docenteId,
+                                orarioDiInizio: overlappingLesson.orarioDiInizio,
+                                orarioDiFine: overlappingLesson.orarioDiFine,
+                            };
+                        })(),
                     }
                 });
 

@@ -3,6 +3,7 @@ import {sessionOptions} from '../../lib/session'
 import {NextApiRequest, NextApiResponse} from 'next'
 import {prisma} from '../../lib/database'
 import {Lezione} from './lezioni'
+import {createDupesWhereClause, OverlapError} from "./admin/lezione"
 import {Libretto} from '.prisma/client'
 
 export type LezioneDiRecupero = {
@@ -10,7 +11,7 @@ export type LezioneDiRecupero = {
     orarioDiInizio: Date,
 }
 
-async function lezioniRoute(req: NextApiRequest, res: NextApiResponse<Lezione[]>) {
+async function lezioniRoute(req: NextApiRequest, res: NextApiResponse<Lezione[] | {err: OverlapError}>) {
     const user = req.session.user;
     if (!user || user?.isLoggedIn !== true)
         return res.status(401).end();
@@ -48,16 +49,49 @@ async function lezioniRoute(req: NextApiRequest, res: NextApiResponse<Lezione[]>
             if(!lezioneDaRecuperare)
                 return () => res.status(404).end();
 
+            const lezione = {
+                docenteId: lezioneDaRecuperare.docenteId,
+                alunniIds: lezioneDaRecuperare.alunni.map(alunno => alunno.id),
+                orarioDiInizio: orarioDiInizio,
+                orarioDiFine: (() => {
+                    const orarioDiFine = new Date(orarioDiInizio);
+                    const timeDiff = lezioneDaRecuperare.orarioDiFine.getTime() - lezioneDaRecuperare.orarioDiInizio.getTime();
+                    orarioDiFine.setTime(orarioDiFine.getTime() + timeDiff);
+                    return orarioDiFine;
+                })(),
+            }
+            const dupesWhereClause = createDupesWhereClause([lezione]);
+            const dupes = await tx.lezione.aggregate({
+                where: dupesWhereClause,
+                _count: {id: true},
+            });
+
+            const count = dupes._count.id;
+            if (count > 0)
+                return async () => res.status(400).json({
+                    err: {
+                        type: "overlap",
+                        count: count,
+                        first: await (async () => {
+                            const overlappingLesson = (await tx.lezione.findMany({
+                                where: dupesWhereClause,
+                                take: 1,
+                            }))[0];
+
+                            return {
+                                docenteId: overlappingLesson.docenteId,
+                                orarioDiInizio: overlappingLesson.orarioDiInizio,
+                                orarioDiFine: overlappingLesson.orarioDiFine,
+                            };
+                        })(),
+                    }
+                });
+
             await tx.lezione.create({ data: {
-                    docente: {connect: {id: lezioneDaRecuperare.docenteId}},
-                    alunni: {connect: lezioneDaRecuperare.alunni.map(alunno => {return {id: alunno.id}})},
-                    orarioDiInizio: orarioDiInizio,
-                    orarioDiFine: (() => {
-                        const orarioDiFine = new Date(orarioDiInizio);
-                        const timeDiff = lezioneDaRecuperare.orarioDiFine.getTime() - lezioneDaRecuperare.orarioDiInizio.getTime();
-                        orarioDiFine.setTime(orarioDiFine.getTime() + timeDiff);
-                        return orarioDiFine;
-                    })(),
+                    docente: {connect: {id: lezione.docenteId}},
+                    alunni: {connect: lezione.alunniIds.map(id => {return {id}})},
+                    orarioDiInizio: lezione.orarioDiInizio,
+                    orarioDiFine: lezione.orarioDiFine,
                     recuperoDi: {connect: {id: lezioneDaRecuperare.id}},
                 }});
             return () => res.status(200).end();
