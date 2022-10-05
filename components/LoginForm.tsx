@@ -14,7 +14,7 @@ export default function LoginForm({
 }) {
     return (
         <Form onSubmit={onSubmit}>
-            <h1 className="mb-3">Inserisci sti cazzo di dati di merda</h1>
+            <h1 className="mb-3">Login</h1>
 
             <Form.Group controlId="formEmail" className="mb-3">
                 <Form.Label>Email</Form.Label>
