@@ -1,3 +1,6 @@
+import {z} from "zod";
+import {DateOrStringValidator} from "@/types/zod";
+
 export const Libretto = {
   PRESENTE: 'PRESENTE',
   ASSENTE_GIUSTIFICATO: 'ASSENTE_GIUSTIFICATO',
@@ -5,26 +8,29 @@ export const Libretto = {
   LEZIONE_SALTATA: 'LEZIONE_SALTATA'
 };
 
-export type Libretto = 'PRESENTE' | 'ASSENTE_GIUSTIFICATO' | 'ASSENTE_NON_GIUSTIFICATO' | 'LEZIONE_SALTATA';
-export type Lezione = {
-  id: number,
-  alunni: {
-    nome: string;
-    cognome: string;
-  }[],
-  orarioDiInizio: Date,
-  orarioDiFine: Date,
-  libretto?: Libretto | null,
-  recuperataDa?: {id: number, orarioDiInizio: Date, orarioDiFine: Date},
-  recuperoDi?: {id: number, orarioDiInizio: Date, orarioDiFine: Date},
-}
+export const LibrettoValidator = z.enum([ 'PRESENTE', 'ASSENTE_GIUSTIFICATO', 'ASSENTE_NON_GIUSTIFICATO', 'LEZIONE_SALTATA' ]);
+export type Libretto = z.infer<typeof LibrettoValidator>;
+
+export const LezioneValidator = z.object({
+  id: z.number(),
+  alunni: z.object({
+    nome: z.string(),
+    cognome: z.string(),
+  }).array(),
+  orarioDiInizio: DateOrStringValidator,
+  orarioDiFine: DateOrStringValidator,
+  libretto: LibrettoValidator.optional(),
+  recuperataDa: z.object({id: z.number(), orarioDiInizio: DateOrStringValidator, orarioDiFine: DateOrStringValidator}).optional(),
+  recuperoDi: z.object({id: z.number(), orarioDiInizio: DateOrStringValidator, orarioDiFine: DateOrStringValidator}).optional(),
+});
+export type Lezione = z.infer<typeof LezioneValidator>;
 
 export namespace Post {
-  export type Request = {from: Date, to: Date};
-  export type Response = Lezione[];
+  export const RequestValidator = z.object({from: DateOrStringValidator, to: DateOrStringValidator});
+  export const ResponseValidator = LezioneValidator.array();
 }
 
 export namespace Put {
-  export type Request = {id: number, libretto: Libretto}
-  export type Response = void;
+  export const RequestValidator = z.object({id: z.number(), libretto: LibrettoValidator.optional().nullable()});
+  export const ResponseValidator = z.void();
 }

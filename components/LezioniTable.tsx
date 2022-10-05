@@ -7,7 +7,7 @@ import {Lezione, Libretto} from "@/types/api/lezioni"
 
 type Props = {
     content: Lezione[],
-    onEditLezione?: (editedLezioniField: { id: number } & Partial<Lezione>) => Promise<any>,
+    onEditLezione?: (editedLezioniField: { id: number, libretto?: Libretto | null }) => Promise<any>,
     scrollable?: boolean,
 }
 
@@ -23,7 +23,7 @@ type TableLezione = {
 }
 
 export default function LezioniTable({content, scrollable, onEditLezione}: Props) {
-    const tableData = content.map(lezione => { return {
+    const tableData: TableLezione[] = content.map(lezione => { return {
         id: lezione.id,
         alunni: lezione.alunni.map(alunno => alunno.nome + ' ' + alunno.cognome).join(', '),
         orarioDiInizio: lezione.orarioDiInizio,

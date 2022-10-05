@@ -14,6 +14,10 @@ import AddLezioniModal from "@/components/AddLezioniModal";
 import DeleteLezioniModal from "@/components/DeleteLezioniModal";
 import FilterModal, {Filter} from "@/components/FilterModal";
 import {isOverlapError} from "@/types/api/admin/lezione";
+import {zodFetch} from "@/lib/fetch";
+import * as LezioniApi from "@/types/api/lezioni"
+import * as LezioniAdminApi from "@/types/api/admin/lezioni"
+import * as LezioneApi from "@/types/api/admin/lezione"
 
 type Props = {
     docenti: {
@@ -52,7 +56,7 @@ const Home: NextPage<Props> = (props) => {
             nome: '',
             cognome: '',
         },
-        startDate: new Date() as (Date | undefined | null),
+        startDate: new Date(),
         endDate: undefined as (Date | undefined | null),
     });
     const [showFilterModal, setShowFilterModal] = useState(false);
@@ -60,30 +64,19 @@ const Home: NextPage<Props> = (props) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
 
     const {data: lezioni, mutate: mutateLezioni, isValidating} = useSWR<Lezione[]>(
-        ['/api/admin/lezioni', filter],
-        () => {
-            return fetch("/api/admin/lezioni", {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(filter)
-            }).then(r => r.json()).then(lezioni => lezioni.map((lezione: any) => {
-                return {
-                    ...lezione,
-                    orarioDiInizio: new Date(lezione.orarioDiInizio),
-                    orarioDiFine: new Date(lezione.orarioDiFine),
-                    recuperataDa: lezione.recuperataDa ? {
-                        ...lezione.recuperataDa,
-                        orarioDiInizio: new Date(lezione.recuperataDa.orarioDiInizio),
-                        orarioDiFine: new Date(lezione.recuperataDa.orarioDiFine),
-                    } : undefined,
-                    recuperoDi: lezione.recuperoDi ? {
-                        ...lezione.recuperoDi,
-                        orarioDiInizio: new Date(lezione.recuperoDi.orarioDiInizio),
-                        orarioDiFine: new Date(lezione.recuperoDi.orarioDiFine),
-                    } : undefined,
-                }
-            }));
-        });
+      ['/api/admin/lezioni', filter],
+      async () => {
+          const {parser} = await zodFetch("/api/admin/lezioni", {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: {
+                  validator: LezioniAdminApi.Post.RequestValidator,
+                  value: filter,
+              },
+              responseValidator: LezioniAdminApi.Post.ResponseValidator,
+          });
+          return await parser();
+      });
 
     return <>
         <Layout requiresAuth loading={isValidating}>
@@ -125,10 +118,13 @@ const Home: NextPage<Props> = (props) => {
                                               })
                                           }}
                                           onEditLezione={async (editedLezioneFields) => {
-                                              const res = await fetch('/api/lezioni', {
+                                              const {res} = await zodFetch('/api/lezioni', {
                                                   method: 'PUT',
-                                                  headers: { 'Content-Type': 'application/json' },
-                                                  body: JSON.stringify(editedLezioneFields)
+                                                  body: {
+                                                      value: editedLezioneFields,
+                                                      validator: LezioniApi.Put.RequestValidator,
+                                                  },
+                                                  responseValidator: LezioniApi.Put.ResponseValidator,
                                               });
 
                                               if(res.ok) {
@@ -155,10 +151,13 @@ const Home: NextPage<Props> = (props) => {
                          show={showAddModal}
                          handleClose={ () => setShowAddModal(false) }
                          handleSubmit={ async lezioni => {
-                             const res = await fetch('/api/admin/lezione', {
+                             const {res, parser} = await zodFetch('/api/admin/lezione', {
                                  method: 'POST',
-                                 headers: { 'Content-Type': 'application/json' },
-                                 body: JSON.stringify(lezioni)
+                                 body: {
+                                     value: lezioni,
+                                     validator: LezioneApi.Post.RequestValidator,
+                                 },
+                                 responseValidator: LezioneApi.Post.ResponseValidator,
                              });
 
                              if(res.ok) {
@@ -167,7 +166,7 @@ const Home: NextPage<Props> = (props) => {
                              }
 
                              if(res.status === 400) {
-                                 const { err } = await res.json();
+                                 const { err } = await parser();
                                  if(isOverlapError(err))
                                      return {
                                          success: false,
@@ -182,10 +181,13 @@ const Home: NextPage<Props> = (props) => {
         <DeleteLezioniModal show={showDeleteModal}
                          handleClose={ () => setShowDeleteModal(false) }
                          handleSubmit={ async () => {
-                             const res = await fetch('/api/admin/lezione', {
+                             const {res} = await zodFetch('/api/admin/lezione', {
                                  method: 'DELETE',
-                                 headers: { 'Content-Type': 'application/json' },
-                                 body: JSON.stringify(Array.from(selectedLezioni.keys()))
+                                 body: {
+                                     value: Array.from(selectedLezioni.keys()),
+                                     validator: LezioneApi.Delete.RequestValidator,
+                                 },
+                                 responseValidator: LezioneApi.Delete.ResponseValidator,
                              });
 
                              if(res.ok) {

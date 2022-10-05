@@ -3,6 +3,8 @@ import useUser from '@/lib/useUser'
 import Layout from '@/components/Layout'
 import LoginForm from '@/components/LoginForm'
 import {useRouter} from "next/router";
+import * as LoginApi from "@/types/api/login"
+import { zodFetch } from "@/lib/fetch";
 
 export default function Login() {
     // here we just check if user is already logged in and redirect to profile
@@ -29,17 +31,20 @@ export default function Login() {
                             setErrorMsg("")
                             setIsLoggingIn(true)
 
-                            const res = await fetch('/api/login', {
+                            const {res, parser} = await zodFetch('/api/login', {
                                 method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
+                                body: {
+                                  value: {
                                     email: event.currentTarget.username.value,
                                     password: event.currentTarget.password.value,
-                                }),
+                                  },
+                                  validator: LoginApi.Post.RequestValidator,
+                                },
+                                responseValidator: LoginApi.Post.ResponseValidator,
                             });
 
                             if(res.ok) {
-                                const user = res.json();
+                                const user = await parser();
                                 await Promise.all([
                                     router.push('/login'),
                                     mutateUser(user, false),

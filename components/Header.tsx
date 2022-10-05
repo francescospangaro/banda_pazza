@@ -3,6 +3,8 @@ import {useRouter} from 'next/router'
 import {Navbar, Container, Nav, NavDropdown} from 'react-bootstrap'
 import Link from "next/link"
 import Image from "next/future/image"
+import {zodFetch} from "@/lib/fetch";
+import * as LogoutApi from "@/types/api/logout"
 
 export default function Header() {
     const {user, mutateUser} = useUser()
@@ -39,9 +41,13 @@ export default function Header() {
                         <NavDropdown title={user?.email} id="basic-nav-dropdown">
                             <NavDropdown.Item onClick={async (e) => {
                                 e.preventDefault()
-                                const user = await fetch('/api/logout', {method: 'POST'}).then(res => res.json());
+                                const {parser} = await zodFetch('/api/logout', {
+                                    method: 'POST',
+                                    responseValidator: LogoutApi.Post.ResponseValidator,
+                                });
+
                                 await Promise.all([
-                                    mutateUser(user, false),
+                                    mutateUser(await parser(), false),
                                     router.push('/login'),
                                 ])
                             }}>Logout</NavDropdown.Item>

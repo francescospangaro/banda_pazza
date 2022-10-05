@@ -1,31 +1,36 @@
-export type AlunnoToGenerate = {
-  nome: string,
-  cognome: string,
-  email: string,
-  cf: string,
-  docenteId: number,
-}
+import {z} from "zod"
 
-export type Alunno = {
-  id: number,
-  nome: string,
-  cognome: string,
-  email: string,
-  cf: string,
-  docenteId: number,
-}
+export const AlunnoToGenerateValidator = z.object({
+  nome: z.string(),
+  cognome: z.string(),
+  email: z.string(),
+  cf: z.string(),
+  docenteId: z.number(),
+});
+export type AlunnoToGenerate = z.infer<typeof AlunnoToGenerateValidator>
+
+export const AlunnoValidator = z.object({
+  id: z.number(),
+  nome: z.string(),
+  cognome: z.string(),
+  email: z.string(),
+  cf: z.string(),
+  docenteId: z.number(),
+});
+export type Alunno = z.infer<typeof AlunnoValidator>
 
 export namespace Get {
-  export type Request = void;
-  export type Response = Alunno[];
+  export const ResponseValidator = z.array(AlunnoValidator);
 }
 
 export namespace Post {
-  export type Request = AlunnoToGenerate;
-  export type Response = Alunno;
+  export const RequestValidator = AlunnoToGenerateValidator;
+  export const ResponseValidator = AlunnoValidator;
 }
 
 export namespace Put {
-  export type Request = Partial<Alunno> & {id: number};
-  export type Response = Alunno;
+  export const RequestValidator = AlunnoValidator.partial()
+    .omit({id: true})
+    .merge(z.object({ id: z.number() }));
+  export const ResponseValidator = AlunnoValidator;
 }

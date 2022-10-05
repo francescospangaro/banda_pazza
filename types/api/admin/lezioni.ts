@@ -1,36 +1,39 @@
-import { Libretto } from "@/types/api/lezioni";
+import {z} from "zod";
+import {LibrettoValidator} from "@/types/api/lezioni";
+import {DateOrStringValidator} from "@/types/zod";
 
-export type Lezione = {
-  id: number,
-  alunni: {
-    id: number,
-    nome: string,
-    cognome: string,
-  }[],
-  docente: {
-    id: number,
-    nome: string,
-    cognome: string,
-  },
-  orarioDiInizio: Date,
-  orarioDiFine: Date,
-  libretto?: Libretto | null,
-  recuperataDa?: {id: number, orarioDiInizio: Date, orarioDiFine: Date},
-  recuperoDi?: {id: number, orarioDiInizio: Date, orarioDiFine: Date},
-}
+export const LezioneValidator = z.object({
+  id: z.number(),
+  alunni: z.object({
+    id: z.number(),
+    nome: z.string(),
+    cognome: z.string(),
+  }).array(),
+  docente: z.object({
+    id: z.number(),
+    nome: z.string(),
+    cognome: z.string(),
+  }),
+  orarioDiInizio: DateOrStringValidator,
+  orarioDiFine: DateOrStringValidator,
+  libretto: LibrettoValidator.optional(),
+  recuperataDa: z.object({id: z.number(), orarioDiInizio: DateOrStringValidator, orarioDiFine: DateOrStringValidator}).optional(),
+  recuperoDi: z.object({id: z.number(), orarioDiInizio: DateOrStringValidator, orarioDiFine: DateOrStringValidator}).optional(),
+});
+export type Lezione = z.infer<typeof LezioneValidator>;
 
 export namespace Post {
-  export type Request = {
-    docente: {
-      nome?: string,
-      cognome?: string,
-    },
-    alunno: {
-      nome?: string,
-      cognome?: string,
-    },
-    startDate: Date,
-    endDate?: Date
-  };
-  export type Response = Lezione[];
+  export const RequestValidator = z.object({
+    docente: z.object({
+      nome: z.string().optional(),
+      cognome: z.string().optional(),
+    }),
+    alunno: z.object({
+      nome: z.string().optional(),
+      cognome: z.string().optional(),
+    }),
+    startDate: DateOrStringValidator,
+    endDate: DateOrStringValidator.optional().nullable(),
+  });
+  export const ResponseValidator = LezioneValidator.array();
 }

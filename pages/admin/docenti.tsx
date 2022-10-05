@@ -8,6 +8,8 @@ import DocentiTable from "@/components/DocentiTable";
 import DocenteModal, {AddProps, EditProps} from "@/components/DocenteModal";
 import styles from "@/styles/Home.module.css";
 import {prisma} from "@/lib/database"
+import {zodFetch} from "@/lib/fetch";
+import * as DocenteApi from "@/types/api/admin/docente"
 
 type Props = {
     docenti: Docente[],
@@ -54,18 +56,18 @@ const Home: NextPage<Props> = (props) => {
         <DocenteModal<AddProps> show={showAddModal}
                                 handleClose={() => setShowAddModal(false)}
                                 handleSubmit={async (docente) => {
-                                    const res = await fetch('/api/admin/docente', {
+                                    const {res, parser} = await zodFetch('/api/admin/docente', {
                                         method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify(docente)
+                                        body: {
+                                            value: docente,
+                                            validator: DocenteApi.Post.RequestValidator,
+                                        },
+                                        responseValidator: DocenteApi.Post.ResponseValidator,
                                     });
 
                                     if(res.ok) {
-                                        const docente = await res.json();
-                                        setDocenti(docenti => [...docenti, {
-                                            id: Number(docente.id),
-                                            ...docente,
-                                        }]);
+                                        const docente = await parser();
+                                        setDocenti(docenti => [...docenti, docente]);
                                         return {success: true, errMsg: ''};
                                     }
 
@@ -80,14 +82,17 @@ const Home: NextPage<Props> = (props) => {
                                      setEditingDocente(null);
                                  }}
                                  handleSubmit={async (editedDocenteFields) => {
-                                     const res = await fetch('/api/admin/docente', {
+                                     const {res, parser} = await zodFetch('/api/admin/docente', {
                                          method: 'PUT',
-                                         headers: { 'Content-Type': 'application/json' },
-                                         body: JSON.stringify(editedDocenteFields)
+                                         body: {
+                                             value: editedDocenteFields,
+                                             validator: DocenteApi.Put.RequestValidator,
+                                         },
+                                         responseValidator: DocenteApi.Put.ResponseValidator,
                                      });
 
                                      if(res.ok) {
-                                         const docente = await res.json();
+                                         const docente = await parser();
                                          setDocenti(docenti => {
                                              const newArr = [ ...docenti ];
                                              newArr[newArr.findIndex(d => d.id === docente.id)] = docente;

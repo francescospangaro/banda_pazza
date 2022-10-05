@@ -1,14 +1,20 @@
 import {useEffect} from 'react'
 import Router from 'next/router'
 import useSWR from 'swr'
-import {User} from '@/types/api/user'
+import {zodFetch} from "@/lib/fetch";
+import {Get, User} from '@/types/api/user'
 
 export default function useUser({
                                     redirectTo = '',
                                     redirectIfFound = false,
                                 } = {}) {
-    const fetcher = (url: string) => fetch(url).then(r => r.json());
-    const swrResponse = useSWR<User>('/api/user', fetcher);
+    const swrResponse = useSWR<User>('/api/user', async (url: string) => {
+        const {parser} = await zodFetch(url, {
+            method: "get",
+            responseValidator: Get.ResponseValidator,
+        });
+        return await parser();
+    });
     const user = swrResponse.data
 
     useEffect(() => {

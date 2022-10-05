@@ -10,7 +10,7 @@ export type Filter = {
         nome: string,
         cognome: string,
     },
-    startDate: Date | undefined | null,
+    startDate: Date,
     endDate: Date | undefined | null,
 }
 
@@ -39,7 +39,7 @@ export default function FilterModal({filter, show, handleClose, handleSubmit}: P
                         nome: e.currentTarget.nomeAlunno.value,
                         cognome: e.currentTarget.cognomeAlunno.value,
                     },
-                    startDate: e.currentTarget.startDate.value ? new Date(e.currentTarget.startDate.value) : null,
+                    startDate: new Date(e.currentTarget.startDate.value),
                     endDate: e.currentTarget.startDate.value ? new Date(e.currentTarget.endDate.value) : null,
                 });
                 handleClose();
@@ -51,7 +51,7 @@ export default function FilterModal({filter, show, handleClose, handleSubmit}: P
                             <Form.Control className="w-100" type="date" name="startDate" defaultValue={filter.startDate?.toLocaleDateString(
                                 'en-CA',
                                 {year: "numeric", month: "2-digit", day: "2-digit"},
-                            )} />
+                            )} required />
                         </Col>
 
                         <Col xs="12">

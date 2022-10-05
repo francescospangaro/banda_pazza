@@ -4,6 +4,8 @@ import React, {useState} from "react";
 import Layout from "@/components/Layout"
 import {Button, Col, Container, Row} from "react-bootstrap"
 import {Alunno} from "@/types/api/admin/alunno";
+import {zodFetch} from "@/lib/fetch";
+import * as AlunnoApi from "@/types/api/admin/alunno";
 import {Docente} from "@/types/api/admin/docente";
 import AlunniTable from "@/components/AlunniTable";
 import AlunnoModal, {AddProps, EditProps} from "@/components/AlunnoModal";
@@ -59,18 +61,18 @@ const Home: NextPage<Props> = (props) => {
                                docenti={props.docenti}
                                handleClose={() => setShowAddModal(false)}
                                handleSubmit={async (alunno) => {
-                                   const res = await fetch('/api/admin/alunno', {
+                                   const {res, parser} = await zodFetch('/api/admin/alunno', {
                                        method: 'POST',
-                                       headers: { 'Content-Type': 'application/json' },
-                                       body: JSON.stringify(alunno)
+                                       body: {
+                                           value: alunno,
+                                           validator: AlunnoApi.Post.RequestValidator,
+                                       },
+                                       responseValidator: AlunnoApi.Post.ResponseValidator,
                                    });
 
                                    if(res.ok) {
-                                       const alunno = await res.json();
-                                       setAlunni(alunni => [...alunni, {
-                                           id: Number(alunno.id),
-                                           ...alunno,
-                                       }]);
+                                       const alunno = await parser();
+                                       setAlunni(alunni => [...alunni, alunno]);
                                        return {success: true, errMsg: ''};
                                    }
 
@@ -86,14 +88,17 @@ const Home: NextPage<Props> = (props) => {
                                     setEditingAlunno(null);
                                 }}
                                 handleSubmit={async (editedAlunnoFields) => {
-                                    const res = await fetch('/api/admin/alunno', {
+                                    const {res, parser} = await zodFetch('/api/admin/alunno', {
                                         method: 'PUT',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify(editedAlunnoFields)
+                                        body: {
+                                            value: editedAlunnoFields,
+                                            validator: AlunnoApi.Put.RequestValidator,
+                                        },
+                                        responseValidator: AlunnoApi.Put.ResponseValidator,
                                     });
 
                                     if(res.ok) {
-                                        const alunno = await res.json();
+                                        const alunno = await parser();
                                         setAlunni(alunni => {
                                             const newArr = [ ...alunni ];
                                             newArr[newArr.findIndex(a => a.id === alunno.id)] = alunno;

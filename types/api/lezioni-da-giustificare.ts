@@ -1,17 +1,19 @@
-import { Lezione } from "@/types/api/lezioni";
-import { OverlapError } from "@/types/api/admin/lezione";
+import {z} from "zod";
+import {LezioneValidator} from "@/types/api/lezioni";
+import {OverlapErrorValidator} from "@/types/api/admin/lezione";
+import {DateOrStringValidator} from "@/types/zod";
 
-export type LezioneDiRecupero = {
-  idDaRecuperare: number,
-  orarioDiInizio: Date,
-}
+export const LezioneDiRecuperoValidator = z.object({
+  idDaRecuperare: z.number(),
+  orarioDiInizio: DateOrStringValidator,
+});
+export type LezioneDiRecupero = z.infer<typeof LezioneDiRecuperoValidator>;
 
 export namespace Get {
-  export type Request = void
-  export type Response = Lezione[]
+  export const ResponseValidator = LezioneValidator.array();
 }
 
 export namespace Post {
-  export type Request = LezioneDiRecupero
-  export type Response = {err?: OverlapError}
+  export const RequestValidator = LezioneDiRecuperoValidator;
+  export const ResponseValidator = z.object({err: OverlapErrorValidator.optional()});
 }

@@ -11,8 +11,10 @@ import useSWR from "swr";
 import {Lezione} from "@/types/api/lezioni";
 import {Container, Col, Row, Form, Button} from "react-bootstrap"
 import RecuperaLezioneModal from "@/components/RecuperaLezioniModal";
+import {zodFetch} from "@/lib/fetch";
+import * as LezioniApi from "@/types/api/lezioni"
 import * as LezioniDaGiustificareApi from "@/types/api/lezioni-da-giustificare"
-import { isOverlapError } from "@/types/api/admin/lezione";
+import {isOverlapError} from "@/types/api/admin/lezione";
 
 type Props = {
     docente: User;
@@ -33,53 +35,38 @@ const Home: NextPage<Props> = () => {
         '/api/lezioni/' + currentDate.toLocaleDateString(
             'en-US',
             {year: "numeric", month: "numeric", day: "numeric"},
-        ), () => {
-            return fetch("/api/lezioni", {
+        ), async () => {
+            const {parser} = await zodFetch("/api/lezioni", {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    from: (() => {
-                        const startOfDay = new Date(currentDate);
-                        startOfDay.setHours(0, 0, 0, 0);
-                        return startOfDay;
-                    })(),
-                    to: (() => {
-                        const endOfDay = new Date(currentDate);
-                        endOfDay.setHours(23, 59, 59, 9999);
-                        return endOfDay;
-                    })(),
-                })
-            }).then(r => r.json()).then(lezioni => lezioni.map((lezione: any) => {
-                return {
-                    ...lezione,
-                    orarioDiInizio: new Date(lezione.orarioDiInizio),
-                    orarioDiFine: new Date(lezione.orarioDiFine),
-                    recuperataDa: lezione.recuperataDa ? {
-                        ...lezione.recuperataDa,
-                        orarioDiInizio: new Date(lezione.recuperataDa.orarioDiInizio),
-                        orarioDiFine: new Date(lezione.recuperataDa.orarioDiFine),
-                    } : undefined,
-                    recuperoDi: lezione.recuperoDi ? {
-                        ...lezione.recuperoDi,
-                        orarioDiInizio: new Date(lezione.recuperoDi.orarioDiInizio),
-                        orarioDiFine: new Date(lezione.recuperoDi.orarioDiFine),
-                    } : undefined,
-                }
-            }));
+                body: {
+                    value: {
+                        from: (() => {
+                            const startOfDay = new Date(currentDate);
+                            startOfDay.setHours(0, 0, 0, 0);
+                            return startOfDay;
+                        })(),
+                        to: (() => {
+                            const endOfDay = new Date(currentDate);
+                            endOfDay.setHours(23, 59, 59, 9999);
+                            return endOfDay;
+                        })(),
+                    },
+                    validator: LezioniApi.Post.RequestValidator,
+                },
+                responseValidator: LezioniApi.Post.ResponseValidator,
+            });
+            const lezioni: Lezione[] = await parser();
+            return lezioni;
         });
     const {data: lezioniDaRecuperare, mutate: mutateLezioniDaGiustificare} = useSWR<Lezione[]>(
         '/api/lezioni-da-giustificare',
-        (url: string) => {
-            return fetch(url, {
+        async (url: string) => {
+            const {parser} = await zodFetch(url, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
-            }).then(r => r.json()).then(lezioni => lezioni.map((lezione: any) => {
-                return {
-                    ...lezione,
-                    orarioDiInizio: new Date(lezione.orarioDiInizio),
-                    orarioDiFine: new Date(lezione.orarioDiFine),
-                }
-            }));
+                responseValidator: LezioniDaGiustificareApi.Get.ResponseValidator,
+            });
+            return await parser();
         });
 
     return <>
@@ -115,10 +102,13 @@ const Home: NextPage<Props> = () => {
                         </Col>
                     </Row>
                     <LezioniTable scrollable content={lezioni ?? []} onEditLezione={async (editedLezioneFields) => {
-                        const res = await fetch('/api/lezioni', {
+                        const {res} = await zodFetch('/api/lezioni', {
                             method: 'PUT',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(editedLezioneFields)
+                            body: {
+                                value: editedLezioneFields,
+                                validator: LezioniApi.Put.RequestValidator,
+                            },
+                            responseValidator: LezioniApi.Put.ResponseValidator,
                         });
 
                         if(res.ok) {
@@ -129,19 +119,8 @@ const Home: NextPage<Props> = () => {
 
                         if(res.status === 404)
                             return { success: false, errMsg: "Impossibile trovare la lezione" };
-
-                        if(res.status === 400) {
-                            const { err } = await res.json();
-                            if(isOverlapError(err)) {
-                                return {
-                                    success: false,
-                                    errMsg: "Ci sono " + err.count + " sovrapposizioni",
-                                };
-                            }
-
+                        if(res.status === 400)
                             return { success: false, errMsg: "Parametri non validi" };
-                        }
-
                         return { success: false, errMsg: "Errore non previsto" };
                     }} />
                 </main>
@@ -152,11 +131,13 @@ const Home: NextPage<Props> = () => {
                               handleClose={() => setShowRecuperiModal(false)}
                               lezioniDaRecuperare={lezioniDaRecuperare ?? []}
                               handleSubmit={async (lezioneGiustificata) => {
-                                  const requestBody: LezioniDaGiustificareApi.Post.Request = lezioneGiustificata;
-                                  const res = await fetch('/api/lezioni-da-giustificare', {
+                                  const {res, parser} = await zodFetch('/api/lezioni-da-giustificare', {
                                       method: 'POST',
-                                      headers: { 'Content-Type': 'application/json' },
-                                      body: JSON.stringify(requestBody)
+                                      body: {
+                                          value: lezioneGiustificata,
+                                          validator: LezioniDaGiustificareApi.Post.RequestValidator,
+                                      },
+                                      responseValidator: LezioniDaGiustificareApi.Post.ResponseValidator,
                                   });
 
                                   if(res.ok) {
@@ -166,7 +147,7 @@ const Home: NextPage<Props> = () => {
                                   }
 
                                   if(res.status === 400) {
-                                      const { err } = (await res.json()) as LezioniDaGiustificareApi.Post.Response;
+                                      const { err } = await parser();
                                       if(isOverlapError(err))
                                           return {
                                               success: false,

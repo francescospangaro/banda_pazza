@@ -14,7 +14,7 @@ type TableLezione = {
     alunni: string,
     orarioDiInizio: Date,
     orarioDiFine: Date,
-    libretto?: Libretto | null,
+    libretto?: Libretto,
     note?: string,
     recuperataDa?: {id: number, orarioDiInizio: Date, orarioDiFine: Date},
     recuperoDi?: {id: number, orarioDiInizio: Date, orarioDiFine: Date},
@@ -25,12 +25,12 @@ type TableLezione = {
 type Props = {
     content: (Lezione & { selectable: boolean, selected: boolean, })[]
     onSelectLezione?: (lezione: Lezione, selected: boolean) => void,
-    onEditLezione?: (editedLezioniField: { id: number } & Partial<Lezione>) => Promise<any>,
+    onEditLezione?: (editedLezioniField: { id: number, libretto?: Libretto | null }) => Promise<any>,
     scrollable?: boolean,
 }
 
 export default function LezioniAdvancedTable({content, onSelectLezione, onEditLezione, scrollable}: Props) {
-    const tableData = content.map(lezione => { return {
+    const tableData: TableLezione[] = content.map(lezione => { return {
         in: lezione,
         id: lezione.id,
         docente: lezione.docente.nome + ' ' + lezione.docente.cognome,

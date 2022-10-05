@@ -1,36 +1,41 @@
+import {asHandler, endpoint} from "next-better-api";
 import {withIronSessionApiRoute} from 'iron-session/next'
 import {sessionOptions} from '@/lib/session'
-import {NextApiRequest, NextApiResponse} from 'next'
 import {prisma} from '@/lib/database'
+import {Post} from "@/types/api/login"
 import bcrypt from "bcrypt"
 
-async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
-    const {email, password} = await req.body
-    if (!email || !password)
-        return res.status(400).end();
+const login = endpoint(
+  {
+      method: "post",
+      bodySchema: Post.RequestValidator,
+      responseSchema: Post.ResponseValidator,
+  },
+  async ({req, body}) => {
+      const {email, password} = body;
 
-    try {
-        const user = await prisma.docente.findFirst({where: {email: email}})
-        if (!user)
-            return res.status(401).end();
+      const user = await prisma.docente.findFirst({where: {email: email}})
+      if (!user)
+          return {status: 401};
 
-        const match = await bcrypt.compare(password, user.password)
-        if (!match)
-            return res.status(401).end();
+      const match = await bcrypt.compare(password, user.password)
+      if (!match)
+          return {status: 401};
 
-        req.session.user = {
-            id: user.id,
-            email: user.email,
-            admin: user.admin,
-            isLoggedIn: true,
-            oreRecuperare: 0,
-        }
-        await req.session.save()
+      req.session.user = {
+          id: user.id,
+          email: user.email,
+          admin: user.admin,
+          isLoggedIn: true,
+          oreRecuperare: 0,
+      }
+      await req.session.save()
 
-        res.status(200).json(req.session.user)
-    } catch (error) {
-        res.status(500).json({message: (error as Error).message})
-    }
-}
+      return {
+          status: 200,
+          body: req.session.user
+      };
+  }
+);
 
-export default withIronSessionApiRoute(loginRoute, sessionOptions)
+export default withIronSessionApiRoute(asHandler([login]), sessionOptions)
