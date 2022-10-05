@@ -1,7 +1,7 @@
 import {Modal, Form, Button, Col} from "react-bootstrap"
 import {useState} from "react";
-import {LezioneDiRecupero} from "../pages/api/lezioni-da-giustificare"
-import {Lezione} from "../pages/api/lezioni";
+import {LezioneDiRecupero} from "@/pages/api/lezioni-da-giustificare"
+import {Lezione} from "@/pages/api/lezioni";
 
 type Props = {
     show: boolean,

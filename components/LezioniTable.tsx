@@ -1,9 +1,9 @@
 import {Column} from "react-table";
 import React, {useMemo} from "react";
-import GenericTable from "./GenericTable"
+import GenericTable from "@/components/GenericTable"
 import TextareaAutosize from "react-textarea-autosize"
 import {Form} from "react-bootstrap"
-import {Lezione, Libretto} from "../pages/api/lezioni"
+import {Lezione, Libretto} from "@/pages/api/lezioni"
 
 type Props = {
     content: Lezione[],

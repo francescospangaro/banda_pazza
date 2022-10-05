@@ -1,7 +1,7 @@
 import {Modal, Form, Button, Col} from "react-bootstrap"
 import {useState} from "react";
-import {AlunnoToGenerate, Alunno} from "../pages/api/admin/alunno";
-import {Docente} from "../pages/api/admin/docente";
+import {AlunnoToGenerate, Alunno} from "@/pages/api/admin/alunno";
+import {Docente} from "@/pages/api/admin/docente";
 
 type Props<T> = {
     show: boolean,

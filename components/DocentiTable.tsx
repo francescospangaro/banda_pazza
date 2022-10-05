@@ -1,8 +1,8 @@
 import React, {useMemo, useState} from "react";
 import {Column} from "react-table";
-import GenericTable from "./GenericTable";
+import GenericTable from "@/components/GenericTable";
 import {Button} from "react-bootstrap";
-import {Docente} from "../pages/api/admin/docente";
+import {Docente} from "@/pages/api/admin/docente";
 
 type Props = {
     content: Docente[],

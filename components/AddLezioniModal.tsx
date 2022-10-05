@@ -1,6 +1,6 @@
 import {Modal, Form, Button, Row, Col, InputGroup} from "react-bootstrap"
 import {useState} from "react";
-import {LezioneToGenerate as GeneratedLezione} from "../pages/api/admin/lezione"
+import {LezioneToGenerate as GeneratedLezione} from "@/pages/api/admin/lezione"
 
 type Props = {
     docenti: {

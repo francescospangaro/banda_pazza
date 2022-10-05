@@ -1,10 +1,10 @@
 import { withIronSessionApiRoute } from 'iron-session/next'
-import { sessionOptions } from '../../../lib/session'
+import { sessionOptions } from '@/lib/session'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { prisma } from '../../../lib/database'
-import {Libretto} from '../lezioni'
+import { prisma } from '@/lib/database'
+import {Libretto} from '@/api/lezioni'
 
-export {Libretto} from "../lezioni"
+export {Libretto} from "@/api/lezioni"
 export type Lezione = {
     id: number,
     alunni: {

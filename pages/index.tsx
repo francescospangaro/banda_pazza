@@ -1,17 +1,17 @@
 import type {NextPage} from 'next'
-import styles from '../styles/Home.module.css'
-import {User} from "./api/user";
+import styles from '@/styles/Home.module.css'
+import {User} from "@/api/user";
 
 import React, {useState} from "react";
-import Layout from "../components/Layout"
-import LezioniTable from "../components/LezioniTable";
+import Layout from "@/components/Layout"
+import LezioniTable from "@/components/LezioniTable";
 
-import requireAuth from "../lib/auth"
+import requireAuth from "@/lib/auth"
 import useSWR from "swr";
-import {Lezione} from "./api/lezioni";
+import {Lezione} from "@/api/lezioni";
 import {Container, Col, Row, Form, Button} from "react-bootstrap"
-import RecuperaLezioneModal from "../components/RecuperaLezioniModal";
-import {isOverlapError} from "./api/admin/lezione";
+import RecuperaLezioneModal from "@/components/RecuperaLezioniModal";
+import {isOverlapError} from "@/api/admin/lezione";
 
 type Props = {
     docente: User;

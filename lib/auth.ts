@@ -1,5 +1,5 @@
 import {withIronSessionSsr} from "iron-session/next";
-import {sessionOptions} from "./session";
+import {sessionOptions} from "@/lib/session";
 import {GetServerSidePropsContext, GetServerSidePropsResult} from "next";
 
 const requireAuth = <P  extends { [key: string]: unknown } = { [key: string]: unknown }>(gssp: (

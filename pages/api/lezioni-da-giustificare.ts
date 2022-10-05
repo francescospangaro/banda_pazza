@@ -1,9 +1,9 @@
 import {withIronSessionApiRoute} from 'iron-session/next'
-import {sessionOptions} from '../../lib/session'
+import {sessionOptions} from '@/lib/session'
 import {NextApiRequest, NextApiResponse} from 'next'
-import {prisma} from '../../lib/database'
-import {Lezione} from './lezioni'
-import {createDupesWhereClause, OverlapError} from "./admin/lezione"
+import {prisma} from '@/lib/database'
+import {Lezione} from '@/api/lezioni'
+import {createDupesWhereClause, OverlapError} from "@/api/admin/lezione"
 import {Libretto} from '.prisma/client'
 
 export type LezioneDiRecupero = {

@@ -1,7 +1,7 @@
 import {withIronSessionApiRoute} from 'iron-session/next'
-import {sessionOptions} from '../../lib/session'
+import {sessionOptions} from '@/lib/session'
 import {NextApiRequest, NextApiResponse} from 'next'
-import {prisma} from '../../lib/database'
+import {prisma} from '@/lib/database'
 import bcrypt from "bcrypt"
 
 async function loginRoute(req: NextApiRequest, res: NextApiResponse) {

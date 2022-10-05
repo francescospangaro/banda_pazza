@@ -1,9 +1,9 @@
 import React, {useMemo, useState} from "react";
 import {Column} from "react-table";
-import GenericTable from "./GenericTable";
+import GenericTable from "@/components/GenericTable";
 import {Button} from "react-bootstrap";
-import {Alunno} from "../pages/api/admin/alunno";
-import {Docente} from "../pages/api/admin/docente";
+import {Alunno} from "@/pages/api/admin/alunno";
+import {Docente} from "@/pages/api/admin/docente";
 
 type TableAlunno = Alunno & {
     editable: boolean,

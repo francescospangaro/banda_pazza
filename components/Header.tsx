@@ -1,4 +1,4 @@
-import useUser from '../lib/useUser'
+import useUser from '@/lib/useUser'
 import {useRouter} from 'next/router'
 import {Navbar, Container, Nav, NavDropdown} from 'react-bootstrap'
 import Link from "next/link"

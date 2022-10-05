@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import useUser from '../lib/useUser'
-import Layout from '../components/Layout'
-import LoginForm from '../components/LoginForm'
+import useUser from '@/lib/useUser'
+import Layout from '@/components/Layout'
+import LoginForm from '@/components/LoginForm'
 import {useRouter} from "next/router";
 
 export default function Login() {
