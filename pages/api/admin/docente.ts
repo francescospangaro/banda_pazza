@@ -3,24 +3,9 @@ import {sessionOptions} from '@/lib/session'
 import {NextApiRequest, NextApiResponse} from 'next'
 import {prisma} from '@/lib/database'
 import bcrypt from "bcrypt"
+import {Get, Post, Put} from "@/types/api/admin/docente"
 
-export type DocenteToGenerate = {
-    nome: string,
-    cognome: string,
-    email: string,
-    cf: string,
-    password: string,
-}
-
-export type Docente = {
-    id: number,
-    nome: string,
-    cognome: string,
-    email: string,
-    cf: string,
-}
-
-async function docenteRoute(req: NextApiRequest, res: NextApiResponse<Docente | Docente[]>) {
+async function docenteRoute(req: NextApiRequest, res: NextApiResponse<Get.Response | Post.Response | Put.Response>) {
     const user = req.session.user;
     if (!user || user?.isLoggedIn !== true || user?.admin !== true)
         return res.status(401).end();
@@ -35,7 +20,7 @@ async function docenteRoute(req: NextApiRequest, res: NextApiResponse<Docente | 
             cf: docente.cf,
         }}));
     } else if(req.method === 'POST') {
-        const toGenerate = req.body as DocenteToGenerate;
+        const toGenerate = (await req.body) as Post.Request;
         if(!toGenerate ||
             !toGenerate.nome || !toGenerate.cognome || !toGenerate.email ||
             !toGenerate.cf || !toGenerate.password)
@@ -59,7 +44,7 @@ async function docenteRoute(req: NextApiRequest, res: NextApiResponse<Docente | 
             cf: docente.cf,
         });
     } else if(req.method === 'PUT') {
-        const toEdit = req.body as Partial<Docente & { password: string }>;
+        const toEdit = (await req.body) as Put.Request;
         if(!toEdit || !toEdit.id)
             return res.status(400).end();
 

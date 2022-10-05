@@ -2,35 +2,15 @@ import { withIronSessionApiRoute } from 'iron-session/next'
 import { sessionOptions } from '@/lib/session'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/database'
+import {Post, Put} from "@/types/api/lezioni";
 
-export const Libretto = {
-    PRESENTE: 'PRESENTE',
-    ASSENTE_GIUSTIFICATO: 'ASSENTE_GIUSTIFICATO',
-    ASSENTE_NON_GIUSTIFICATO: 'ASSENTE_NON_GIUSTIFICATO',
-    LEZIONE_SALTATA: 'LEZIONE_SALTATA'
-};
-
-export type Libretto = 'PRESENTE' | 'ASSENTE_GIUSTIFICATO' | 'ASSENTE_NON_GIUSTIFICATO' | 'LEZIONE_SALTATA';
-export type Lezione = {
-    id: number,
-    alunni: {
-        nome: string;
-        cognome: string;
-    }[],
-    orarioDiInizio: Date,
-    orarioDiFine: Date,
-    libretto?: Libretto | null,
-    recuperataDa?: {id: number, orarioDiInizio: Date, orarioDiFine: Date},
-    recuperoDi?: {id: number, orarioDiInizio: Date, orarioDiFine: Date},
-}
-
-async function lezioniRoute(req: NextApiRequest, res: NextApiResponse<Lezione[]>) {
+async function lezioniRoute(req: NextApiRequest, res: NextApiResponse<Post.Response | Put.Response>) {
     const user = req.session.user;
     if(!user || user?.isLoggedIn !== true)
         return res.status(401).end();
 
     if(req.method === 'POST') {
-        const { from, to } = await req.body;
+        const { from, to } = (await req.body) as Post.Request;
         if(!from || !to)
             return res.status(400).end();
 
@@ -66,7 +46,7 @@ async function lezioniRoute(req: NextApiRequest, res: NextApiResponse<Lezione[]>
             }
         }));
     } else if(req.method === 'PUT') {
-        const { id, libretto } = await req.body;
+        const { id, libretto } = (await req.body) as Put.Request;
         if(!id)
             return res.status(400).end();
 

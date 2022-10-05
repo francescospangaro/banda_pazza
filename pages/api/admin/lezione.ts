@@ -2,27 +2,7 @@ import {withIronSessionApiRoute} from 'iron-session/next'
 import {sessionOptions} from '@/lib/session'
 import {NextApiRequest, NextApiResponse} from 'next'
 import {prisma} from '@/lib/database'
-
-export type LezioneToGenerate = {
-    alunniIds: number[],
-    docenteId: number,
-    orario: Date,
-    durataInMin: number,
-}
-
-export type OverlapError = {
-    type: "overlap",
-    count: number,
-    first: {
-        docenteId: number,
-        orarioDiInizio: Date,
-        orarioDiFine: Date,
-    },
-}
-
-export function isOverlapError(err: any): err is OverlapError {
-    return err && (err as OverlapError).type === "overlap";
-}
+import {Post, Delete} from "@/types/api/admin/lezione"
 
 export function createDupesWhereClause(lezioni: {
     alunniIds: number[],
@@ -47,7 +27,7 @@ export function createDupesWhereClause(lezioni: {
             ]}})};
 }
 
-async function lezioneRoute(req: NextApiRequest, res: NextApiResponse<{err: OverlapError} | void>) {
+async function lezioneRoute(req: NextApiRequest, res: NextApiResponse<Post.Response | Delete.Response>) {
     const user = req.session.user;
     if (!user || user?.isLoggedIn !== true || user?.admin !== true)
         return res.status(401).end();
@@ -57,7 +37,7 @@ async function lezioneRoute(req: NextApiRequest, res: NextApiResponse<{err: Over
         if (!body)
             return res.status(400).end();
 
-        const lezioni = (body as LezioneToGenerate[]).map(lezione => { return {
+        const lezioni = (body as Post.Request).map(lezione => { return {
             alunniIds: lezione.alunniIds.map(id => Number(id)),
             docenteId: Number(lezione.docenteId),
             orarioDiInizio: new Date(lezione.orario),
@@ -122,7 +102,7 @@ async function lezioneRoute(req: NextApiRequest, res: NextApiResponse<{err: Over
             return () => res.status(200).end();
         }))();
     } else if(req.method === 'DELETE') {
-        const lessons = await req.body;
+        const lessons = (await req.body) as Delete.Request;
         if (!lessons)
             return res.status(200).end();
 

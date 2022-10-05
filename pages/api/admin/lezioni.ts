@@ -2,30 +2,10 @@ import { withIronSessionApiRoute } from 'iron-session/next'
 import { sessionOptions } from '@/lib/session'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/database'
-import {Libretto} from '@/api/lezioni'
+import {Post} from "@/types/api/admin/lezioni"
 
-export {Libretto} from "@/api/lezioni"
-export type Lezione = {
-    id: number,
-    alunni: {
-        id: number,
-        nome: string,
-        cognome: string,
-    }[],
-    docente: {
-        id: number,
-        nome: string,
-        cognome: string,
-    },
-    orarioDiInizio: Date,
-    orarioDiFine: Date,
-    libretto?: Libretto | null,
-    recuperataDa?: {id: number, orarioDiInizio: Date, orarioDiFine: Date},
-    recuperoDi?: {id: number, orarioDiInizio: Date, orarioDiFine: Date},
-}
-
-async function lezioniRoute(req: NextApiRequest, res: NextApiResponse<Lezione[]>) {
-    let { docente, alunno, startDate, endDate } = await req.body;
+async function lezioniRoute(req: NextApiRequest, res: NextApiResponse<Post.Response>) {
+    let { docente, alunno, startDate, endDate } = (await req.body) as Post.Request;
     const user = req.session.user;
 
     if(!user || user?.isLoggedIn !== true || user?.admin !== true)

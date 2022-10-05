@@ -1,6 +1,6 @@
 import {Modal, Form, InputGroup, Button, Col} from "react-bootstrap"
 import {useState} from "react";
-import {DocenteToGenerate, Docente} from "@/pages/api/admin/docente";
+import {DocenteToGenerate, Docente} from "@/types/api/admin/docente";
 import generatePassword from "omgopass";
 
 type Props<T> = {

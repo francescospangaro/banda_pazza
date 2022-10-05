@@ -3,7 +3,8 @@ import GenericTable from "@/components/GenericTable"
 import TextareaAutosize from "react-textarea-autosize"
 import {Form} from "react-bootstrap";
 import {Column} from "react-table";
-import {Lezione, Libretto} from "@/pages/api/admin/lezioni"
+import {Lezione} from "@/types/api/admin/lezioni"
+import {Libretto} from "@/types/api/lezioni"
 
 type TableLezione = {
     in: Lezione,

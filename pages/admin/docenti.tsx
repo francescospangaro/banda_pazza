@@ -3,7 +3,7 @@ import {NextPage} from "next";
 import React, {useState} from "react";
 import Layout from "@/components/Layout"
 import {Button, Col, Container, Row} from "react-bootstrap"
-import {Docente} from "@/api/admin/docente";
+import {Docente} from "@/types/api/admin/docente";
 import DocentiTable from "@/components/DocentiTable";
 import DocenteModal, {AddProps, EditProps} from "@/components/DocenteModal";
 import styles from "@/styles/Home.module.css";

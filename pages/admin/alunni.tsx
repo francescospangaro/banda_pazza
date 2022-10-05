@@ -3,8 +3,8 @@ import {NextPage} from "next";
 import React, {useState} from "react";
 import Layout from "@/components/Layout"
 import {Button, Col, Container, Row} from "react-bootstrap"
-import {Alunno} from "@/api/admin/alunno";
-import {Docente} from "@/api/admin/docente";
+import {Alunno} from "@/types/api/admin/alunno";
+import {Docente} from "@/types/api/admin/docente";
 import AlunniTable from "@/components/AlunniTable";
 import AlunnoModal, {AddProps, EditProps} from "@/components/AlunnoModal";
 import styles from "@/styles/Home.module.css";

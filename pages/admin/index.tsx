@@ -8,12 +8,12 @@ import LezioniAdvancedTable from "@/components/LezioniAdvancedTable";
 
 import requireAuth from "@/lib/auth"
 import useSWR from "swr";
-import {Lezione} from "@/api/admin/lezioni";
+import {Lezione} from "@/types/api/admin/lezioni";
 import {Container, Col, Row, Form, Button} from "react-bootstrap"
 import AddLezioniModal from "@/components/AddLezioniModal";
 import DeleteLezioniModal from "@/components/DeleteLezioniModal";
 import FilterModal, {Filter} from "@/components/FilterModal";
-import {isOverlapError} from "@/api/admin/lezione";
+import {isOverlapError} from "@/types/api/admin/lezione";
 
 type Props = {
     docenti: {

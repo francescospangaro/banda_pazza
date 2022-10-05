@@ -2,16 +2,11 @@ import {withIronSessionApiRoute} from 'iron-session/next'
 import {sessionOptions} from '@/lib/session'
 import {NextApiRequest, NextApiResponse} from 'next'
 import {prisma} from '@/lib/database'
-import {Lezione} from '@/api/lezioni'
-import {createDupesWhereClause, OverlapError} from "@/api/admin/lezione"
+import {createDupesWhereClause} from "@/api/admin/lezione"
 import {Libretto} from '.prisma/client'
+import { LezioneDiRecupero, Get, Post } from "@/types/api/lezioni-da-giustificare";
 
-export type LezioneDiRecupero = {
-    idDaRecuperare: number,
-    orarioDiInizio: Date,
-}
-
-async function lezioniRoute(req: NextApiRequest, res: NextApiResponse<Lezione[] | {err: OverlapError}>) {
+async function lezioniRoute(req: NextApiRequest, res: NextApiResponse<Get.Response | Post.Response>) {
     const user = req.session.user;
     if (!user || user?.isLoggedIn !== true)
         return res.status(401).end();

@@ -1,6 +1,7 @@
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { FormEvent } from 'react'
+import { Col } from "react-bootstrap";
 
 export default function LoginForm({
                                  errorMessage,
@@ -28,7 +29,7 @@ export default function LoginForm({
             <Form.Group controlId="formSubmit" className="mb-3">
                 <Button disabled={isLoggingIn} type="submit" className="w-100">Login</Button>
                 {errorMessage && (
-                    <Form.Text muted className="error w-100">{errorMessage}</Form.Text>
+                  <p className="text-danger" style={{ textAlign: 'center' }}>{errorMessage}</p>
                 )}
             </Form.Group>
 

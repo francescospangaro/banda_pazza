@@ -1,6 +1,6 @@
 import type {NextPage} from 'next'
 import styles from '@/styles/Home.module.css'
-import {User} from "@/api/user";
+import {User} from "@/types/api/user";
 
 import React, {useState} from "react";
 import Layout from "@/components/Layout"
@@ -8,10 +8,11 @@ import LezioniTable from "@/components/LezioniTable";
 
 import requireAuth from "@/lib/auth"
 import useSWR from "swr";
-import {Lezione} from "@/api/lezioni";
+import {Lezione} from "@/types/api/lezioni";
 import {Container, Col, Row, Form, Button} from "react-bootstrap"
 import RecuperaLezioneModal from "@/components/RecuperaLezioniModal";
-import {isOverlapError} from "@/api/admin/lezione";
+import * as LezioniDaGiustificareApi from "@/types/api/lezioni-da-giustificare"
+import { isOverlapError } from "@/types/api/admin/lezione";
 
 type Props = {
     docente: User;
@@ -151,11 +152,11 @@ const Home: NextPage<Props> = () => {
                               handleClose={() => setShowRecuperiModal(false)}
                               lezioniDaRecuperare={lezioniDaRecuperare ?? []}
                               handleSubmit={async (lezioneGiustificata) => {
-                                  console.log(lezioneGiustificata);
+                                  const requestBody: LezioniDaGiustificareApi.Post.Request = lezioneGiustificata;
                                   const res = await fetch('/api/lezioni-da-giustificare', {
                                       method: 'POST',
                                       headers: { 'Content-Type': 'application/json' },
-                                      body: JSON.stringify(lezioneGiustificata)
+                                      body: JSON.stringify(requestBody)
                                   });
 
                                   if(res.ok) {
@@ -164,8 +165,16 @@ const Home: NextPage<Props> = () => {
                                       return {success: true, errMsg: ''};
                                   }
 
-                                  if(res.status === 400)
+                                  if(res.status === 400) {
+                                      const { err } = (await res.json()) as LezioniDaGiustificareApi.Post.Response;
+                                      if(isOverlapError(err))
+                                          return {
+                                              success: false,
+                                              errMsg: "Ci sono " +  err.count + " sovrapposizioni",
+                                          };
                                       return { success: false, errMsg: "Parametri non validi" };
+                                  }
+
                                   return { success: false, errMsg: "Errore non previsto" };
                               }} />
     </>;

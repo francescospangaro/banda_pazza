@@ -1,7 +1,7 @@
 import { withIronSessionApiRoute } from 'iron-session/next'
 import { sessionOptions } from '@/lib/session'
 import { NextApiRequest, NextApiResponse } from 'next'
-import type { User } from '@/api/user'
+import type { User } from '@/types/api/user'
 
 function logoutRoute(req: NextApiRequest, res: NextApiResponse<User>) {
     req.session.destroy()

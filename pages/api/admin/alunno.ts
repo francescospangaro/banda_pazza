@@ -2,25 +2,9 @@ import {withIronSessionApiRoute} from 'iron-session/next'
 import {sessionOptions} from '@/lib/session'
 import {NextApiRequest, NextApiResponse} from 'next'
 import {prisma} from '@/lib/database'
+import {Get, Post, Put} from "@/types/api/admin/alunno"
 
-export type AlunnoToGenerate = {
-    nome: string,
-    cognome: string,
-    email: string,
-    cf: string,
-    docenteId: number,
-}
-
-export type Alunno = {
-    id: number,
-    nome: string,
-    cognome: string,
-    email: string,
-    cf: string,
-    docenteId: number,
-}
-
-async function alunnoRoute(req: NextApiRequest, res: NextApiResponse<Alunno | Alunno[]>) {
+async function alunnoRoute(req: NextApiRequest, res: NextApiResponse<Get.Response | Post.Response | Put.Response>) {
     const user = req.session.user;
     if (!user || user?.isLoggedIn !== true || user?.admin !== true)
         return res.status(401).end();
@@ -36,7 +20,7 @@ async function alunnoRoute(req: NextApiRequest, res: NextApiResponse<Alunno | Al
             docenteId: alunno.docenteId,
         }}));
     } else if(req.method === 'POST') {
-        const toGenerate = req.body as AlunnoToGenerate;
+        const toGenerate = (await req.body) as Post.Request;
         if(!toGenerate || !toGenerate.nome || !toGenerate.cognome || !toGenerate.email || !toGenerate.cf || !toGenerate.docenteId)
             return res.status(400).end();
 
@@ -62,7 +46,7 @@ async function alunnoRoute(req: NextApiRequest, res: NextApiResponse<Alunno | Al
             docenteId: alunno.docenteId,
         });
     } else if(req.method === 'PUT') {
-        const toEdit = req.body as Partial<Alunno>;
+        const toEdit = (await req.body) as Put.Request;
         if(!toEdit || !toEdit.id)
             return res.status(400).end();
 
