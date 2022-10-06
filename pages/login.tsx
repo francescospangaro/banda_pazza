@@ -71,6 +71,7 @@ export default function Login() {
         
         .login-box {
           max-width: 21rem;
+          width: 21rem;
           margin: auto;
           padding: 1rem;
           border: 1px solid #ccc;
