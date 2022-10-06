@@ -33,7 +33,7 @@ type Props = {
 export const getServerSideProps = requireAuth<Props>(async () => {
     return {
         props: {
-            docenti: (await prisma.docente.findMany({})).map(d => { return {
+            docenti: (await prisma.docente.findMany({where: {admin: false}})).map(d => { return {
                 id: d.id,
                 fullName: d.nome + ' ' + d.cognome,
             }}),

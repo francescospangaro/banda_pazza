@@ -13,7 +13,7 @@ const getDocenti = endpoint(
   async () => {
       return {
           status: 200,
-          body: (await prisma.docente.findMany({})).map(docente => { return {
+          body: (await prisma.docente.findMany({where: {admin: false}})).map(docente => { return {
               id: docente.id,
               nome: docente.nome,
               cognome: docente.cognome,

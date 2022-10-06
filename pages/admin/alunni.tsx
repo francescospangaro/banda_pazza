@@ -13,7 +13,7 @@ import styles from "@/styles/Home.module.css";
 import {prisma} from "@/lib/database"
 
 type Props = {
-    docenti: Docente[],
+    docenti: (Docente & {admin: boolean})[],
     alunni: Alunno[],
 };
 
@@ -38,6 +38,7 @@ const Home: NextPage<Props> = (props) => {
     const [showAddModal, setShowAddModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [editingAlunno, setEditingAlunno] = useState<Alunno | null>(null);
+    const docentiWithoutAdmins = props.docenti.filter(d => !d.admin);
 
     return <>
         <Layout requiresAuth>
@@ -58,7 +59,7 @@ const Home: NextPage<Props> = (props) => {
         </Layout>
 
         <AlunnoModal<AddProps> show={showAddModal}
-                               docenti={props.docenti}
+                               docenti={docentiWithoutAdmins}
                                handleClose={() => setShowAddModal(false)}
                                handleSubmit={async (alunno) => {
                                    const {res, parser} = await zodFetch('/api/admin/alunno', {
@@ -81,7 +82,7 @@ const Home: NextPage<Props> = (props) => {
                                    return { success: false, errMsg: "Errore non previsto" };
                                }} />
         <AlunnoModal<EditProps> show={showEditModal}
-                                docenti={props.docenti}
+                                docenti={docentiWithoutAdmins}
                                 alunno={editingAlunno!}
                                 handleClose={() => {
                                     setShowEditModal(false);
