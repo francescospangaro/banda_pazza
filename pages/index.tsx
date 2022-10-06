@@ -1,4 +1,4 @@
-import type {NextPage} from 'next'
+import type {GetServerSidePropsResult, NextPage} from 'next'
 import styles from '@/styles/Home.module.css'
 import {User} from "@/types/api/user";
 
@@ -20,10 +20,19 @@ type Props = {
     docente: User;
 }
 
-export const getServerSideProps = requireAuth(async (ctx) => {
+export const getServerSideProps = requireAuth<Props>(async (ctx): Promise<GetServerSidePropsResult<Props>> => {
+    const docente = ctx.req.session.user!;
+    if(docente?.admin)
+        return {
+            redirect: {
+                permanent: true,
+                destination: "/admin/"
+            }
+        };
+
     return {
         props: {
-            docente: ctx.req.session.user
+            docente: ctx.req.session.user!
         }
     }
 })
