@@ -26,6 +26,7 @@ type Props = {
     }[],
     alunni: {
         id: number,
+        docenteId: number,
         fullName: string,
     }[],
 }
@@ -39,6 +40,7 @@ export const getServerSideProps = requireAuth<Props>(async () => {
             }}),
             alunni: (await prisma.alunno.findMany({})).map(d => { return {
                 id: d.id,
+                docenteId: d.docenteId,
                 fullName: d.nome + ' ' + d.cognome,
             }}),
         }

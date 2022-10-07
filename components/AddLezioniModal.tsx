@@ -9,6 +9,7 @@ type Props = {
     }[],
     alunni: {
         id: number,
+        docenteId: number,
         fullName: string,
     }[],
     show: boolean,
@@ -18,6 +19,7 @@ type Props = {
 
 export default function AddLezioniModal({ docenti, alunni: allAlunni, show, handleClose, handleSubmit }: Props) {
     const [alunni, setAlunni] = useState([null] as (string | null)[]);
+    const [docente, setDocente] = useState(null as (number | null));
     const [errorMsg, setErrMsg] = useState('');
     const [executing, setExecuting] = useState(false);
 
@@ -49,7 +51,7 @@ export default function AddLezioniModal({ docenti, alunni: allAlunni, show, hand
                 endDate.setHours(Number(hour), Number(minutes));
                 do {
                     lessons.push({
-                        docenteId: Number(e.currentTarget.docente.value),
+                        docenteId: docente!,
                         alunniIds: alunni.map(alunno => Number(alunno)),
                         orario: new Date(startDate),
                         durataInMin: Number(e.currentTarget.durata.value),
@@ -69,7 +71,7 @@ export default function AddLezioniModal({ docenti, alunni: allAlunni, show, hand
                     <div className="row g-3">
                         <Col xs="12">
                             <Form.Label>Docente</Form.Label>
-                            <Form.Select required name="docente" >
+                            <Form.Select required name="docente" onChange={e => { setDocente(Number(e.currentTarget.value)) }}>
                                 <>
                                     <option></option>
                                     {docenti.map(docente => {
@@ -116,9 +118,11 @@ export default function AddLezioniModal({ docenti, alunni: allAlunni, show, hand
                                             >
                                                 <>
                                                     <option value=""></option>
-                                                    {allAlunni.map(alunno => {
-                                                        return <option key={alunno.id} value={alunno.id}>{alunno.fullName}</option>
-                                                    })}
+                                                    {docente && allAlunni
+                                                      .filter(alunno => !docente || alunno.docenteId === docente)
+                                                      .map(alunno => {
+                                                          return <option key={alunno.id} value={alunno.id}>{alunno.fullName}</option>
+                                                      })}
                                                 </>
                                             </Form.Select>
                                         </InputGroup>
@@ -144,6 +148,7 @@ export default function AddLezioniModal({ docenti, alunni: allAlunni, show, hand
                                 <option></option>
                                 <option value="30">30min</option>
                                 <option value="45">45min</option>
+                                <option value="60">60min</option>
                             </Form.Select>
                         </Col>
                         <Col xs="12">
