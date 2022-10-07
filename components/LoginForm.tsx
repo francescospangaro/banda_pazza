@@ -18,7 +18,7 @@ export default function LoginForm({
 
             <Form.Group controlId="formEmail" className="mb-3">
                 <Form.Label>Email</Form.Label>
-                <Form.Control type="email" name="username" required />
+                <Form.Control type="text" name="username" required />
             </Form.Group>
 
             <Form.Group controlId="formPassword" className="mb-3">
