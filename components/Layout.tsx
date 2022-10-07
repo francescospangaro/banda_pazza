@@ -15,7 +15,7 @@ export default function Layout({ children, requiresAuth, loading }: {
     return (
         <>
             <Head>
-                <title>Banda pazza</title>
+                <title>C.M. Lurago d&apos;Erba</title>
                 <meta name="description" content="Sito della banda pazzissima" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
