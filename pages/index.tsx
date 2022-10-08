@@ -2,7 +2,7 @@ import type {GetServerSidePropsResult, NextPage} from 'next'
 import styles from '@/styles/Home.module.css'
 import {User} from "@/types/api/user";
 
-import React, {useState} from "react";
+import React, { useMemo, useState } from "react";
 import Layout from "@/components/Layout"
 import LezioniTable from "@/components/LezioniTable";
 
@@ -110,7 +110,7 @@ const Home: NextPage<Props> = () => {
                             </Button>
                         </Col>
                     </Row>
-                    <LezioniTable scrollable content={lezioni ?? []} onEditLezione={async (editedLezioneFields) => {
+                    <LezioniTable scrollable content={useMemo(() => lezioni ?? [], [lezioni])} onEditLezione={async (editedLezioneFields) => {
                         const {res} = await zodFetch('/api/lezioni', {
                             method: 'PUT',
                             body: {

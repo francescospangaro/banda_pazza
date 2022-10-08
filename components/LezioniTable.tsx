@@ -23,7 +23,7 @@ type TableLezione = {
 }
 
 export default function LezioniTable({content, scrollable, onEditLezione}: Props) {
-    const tableData: TableLezione[] = content.map(lezione => { return {
+    const tableData: TableLezione[] = useMemo(() => content.map(lezione => { return {
         id: lezione.id,
         alunni: lezione.alunni.map(alunno => alunno.nome + ' ' + alunno.cognome).join(', '),
         orarioDiInizio: lezione.orarioDiInizio,
@@ -39,7 +39,7 @@ export default function LezioniTable({content, scrollable, onEditLezione}: Props
                 ""),
         recuperataDa: lezione.recuperataDa,
         recuperoDi: lezione.recuperoDi,
-    }});
+    }}), [content]);
     const columns = useMemo<Column<TableLezione>[]>(
         () => [
             {

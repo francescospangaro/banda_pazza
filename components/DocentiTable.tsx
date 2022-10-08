@@ -16,10 +16,10 @@ type TableDocente = Docente & {
 
 export default function DocentiTable({content, onEdit, scrollable}: Props) {
     const [editingDocenti, setEditingDocenti] = useState(new Set<number>());
-    const tableData: TableDocente[] = content.map(docente => { return {
+    const tableData: TableDocente[] = useMemo(() => content.map(docente => { return {
         ...docente,
         editable: true,
-    }})
+    }}), [content]);
 
     const columns = useMemo<Column<TableDocente>[]>(
         () => [

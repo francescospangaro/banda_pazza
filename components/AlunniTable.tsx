@@ -18,10 +18,10 @@ type Props = {
 
 export default function AlunniTable({content, docenti, onEdit, scrollable}: Props) {
     const [editingAlunni, setEditingAlunni] = useState(new Set<number>());
-    const tableData: TableAlunno[] = content.map(alunno => { return {
+    const tableData: TableAlunno[] = useMemo(() => content.map(alunno => { return {
         ...alunno,
         editable: true,
-    }});
+    }}), [content]);
     const idToDocente = docenti.reduce((map, docente) => {
         map.set(docente.id, docente);
         return map;
