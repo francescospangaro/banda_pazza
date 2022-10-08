@@ -22,18 +22,28 @@ export const LezioneValidator = z.object({
 });
 export type Lezione = z.infer<typeof LezioneValidator>;
 
+export const LezioneFilterValidator = z.object({
+  docente: z.object({
+    nome: z.string().optional(),
+    cognome: z.string().optional(),
+  }),
+  alunno: z.object({
+    nome: z.string().optional(),
+    cognome: z.string().optional(),
+  }),
+  startDate: DateOrStringValidator,
+  endDate: DateOrStringValidator.optional().nullable(),
+});
+export type LezioneFilter = z.infer<typeof LezioneFilterValidator>;
+
 export namespace Post {
-  export const RequestValidator = z.object({
-    docente: z.object({
-      nome: z.string().optional(),
-      cognome: z.string().optional(),
-    }),
-    alunno: z.object({
-      nome: z.string().optional(),
-      cognome: z.string().optional(),
-    }),
-    startDate: DateOrStringValidator,
-    endDate: DateOrStringValidator.optional().nullable(),
+  export const RequestValidator = LezioneFilterValidator.merge(z.object({
+    pageOnly: z.boolean().optional(),
+    page: z.number().int(),
+  }));
+  export const ResponseValidator = z.object({
+    pageCount: z.number().int(),
+    pageSize: z.number().int(),
+    lezioni: LezioneValidator.array(),
   });
-  export const ResponseValidator = LezioneValidator.array();
 }

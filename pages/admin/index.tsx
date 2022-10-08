@@ -2,18 +2,19 @@ import type {NextPage} from 'next'
 import styles from '@/styles/Home.module.css'
 
 import { prisma } from '@/lib/database'
-import React, {useState} from "react";
+import React, { useMemo, useState } from "react";
 import Layout from "@/components/Layout"
 import LezioniAdvancedTable from "@/components/LezioniAdvancedTable";
 
 import requireAuth from "@/lib/auth"
 import useSWR from "swr";
-import {Lezione} from "@/types/api/admin/lezioni";
 import {Container, Col, Row, Form, Button} from "react-bootstrap"
 import AddLezioniModal from "@/components/AddLezioniModal";
 import DeleteLezioniModal from "@/components/DeleteLezioniModal";
-import FilterModal, {Filter} from "@/components/FilterModal";
+import FilterModal from "@/components/FilterModal";
+import {LezioneFilter} from "@/types/api/admin/lezioni";
 import {isOverlapError} from "@/types/api/admin/lezione";
+import {z} from "zod";
 import {zodFetch} from "@/lib/fetch";
 import * as LezioniApi from "@/types/api/lezioni"
 import * as LezioniAdminApi from "@/types/api/admin/lezioni"
@@ -49,7 +50,7 @@ export const getServerSideProps = requireAuth<Props>(async () => {
 
 const Home: NextPage<Props> = (props) => {
     const [selectedLezioni, setSelectedLezioni] = useState(new Set<number>());
-    const [filter, setFilter] = useState<Filter>({
+    const [filter, setFilter] = useState<LezioneFilter>({
         docente: {
             nome: '',
             cognome: '',
@@ -61,19 +62,37 @@ const Home: NextPage<Props> = (props) => {
         startDate: new Date(),
         endDate: undefined as (Date | undefined | null),
     });
+    const [page, setPage] = useState<number>(0);
     const [showFilterModal, setShowFilterModal] = useState(false);
     const [showAddModal, setShowAddModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-    const {data: lezioni, mutate: mutateLezioni, isValidating} = useSWR<Lezione[]>(
+    type LezioniAdminApiResponse = z.infer<typeof LezioniAdminApi.Post.ResponseValidator>;
+    const {data: {lezioni} = {}, mutate: mutateLezioni, isValidating: isValidatingLezioni} = useSWR<LezioniAdminApiResponse>(
+      ['/api/admin/lezioni', filter, page],
+      async () => {
+          const {parser} = await zodFetch("/api/admin/lezioni", {
+              method: 'POST',
+              body: {
+                  validator: LezioniAdminApi.Post.RequestValidator,
+                  value: {...filter, page},
+              },
+              responseValidator: LezioniAdminApi.Post.ResponseValidator,
+          });
+          return await parser();
+      });
+
+    const {
+        data: { pageCount, pageSize } = { pageSize: 1, pageCount: 1 },
+        isValidating: isValidatingPages
+    } = useSWR<LezioniAdminApiResponse>(
       ['/api/admin/lezioni', filter],
       async () => {
           const {parser} = await zodFetch("/api/admin/lezioni", {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
               body: {
                   validator: LezioniAdminApi.Post.RequestValidator,
-                  value: filter,
+                  value: {...filter, page: 0, pageOnly: true },
               },
               responseValidator: LezioniAdminApi.Post.ResponseValidator,
           });
@@ -81,7 +100,7 @@ const Home: NextPage<Props> = (props) => {
       });
 
     return <>
-        <Layout requiresAuth loading={isValidating}>
+        <Layout requiresAuth loading={isValidatingLezioni || isValidatingPages}>
             <Container fluid className={styles.container}>
                 <main className={styles.main}>
                     <Row className="mb-3 w-100 align-items-center">
@@ -104,11 +123,15 @@ const Home: NextPage<Props> = (props) => {
                     </Row>
 
                     <LezioniAdvancedTable scrollable
-                                          content={lezioni?.map(lezione => { return {
+                                          pageIndex={page}
+                                          pageCount={pageCount}
+                                          pageSize={pageSize}
+                                          fetchPage={page => {setPage(page)}}
+                                          content={useMemo(() => lezioni?.map(lezione => { return {
                                               ...lezione,
                                               selectable: true,
                                               selected: selectedLezioni.has(lezione.id),
-                                          }}) ?? []}
+                                          }}) ?? [], [selectedLezioni, lezioni])}
                                           onSelectLezione={(lezione, selected) => {
                                               setSelectedLezioni(lezioni => {
                                                   const newLezioni = new Set(lezioni);
@@ -147,7 +170,10 @@ const Home: NextPage<Props> = (props) => {
         <FilterModal filter={filter}
                      show={showFilterModal}
                      handleClose={() => setShowFilterModal(false)}
-                     handleSubmit={filter => {setFilter(filter)}} />
+                     handleSubmit={filter => {
+                         setFilter(filter);
+                         setPage(0);
+                     }} />
         <AddLezioniModal docenti={props.docenti}
                          alunni={props.alunni}
                          show={showAddModal}

@@ -1,24 +1,12 @@
-import {Modal, Form, Button, Col, InputGroup} from "react-bootstrap"
 import React from "react";
-
-export type Filter = {
-    docente: {
-        nome: string,
-        cognome: string,
-    },
-    alunno: {
-        nome: string,
-        cognome: string,
-    },
-    startDate: Date,
-    endDate: Date | undefined | null,
-}
+import {Modal, Form, Button, Col, InputGroup} from "react-bootstrap"
+import {LezioneFilter} from "@/types/api/admin/lezioni";
 
 type Props = {
-    filter: Filter,
+    filter: LezioneFilter,
     show: boolean,
     handleClose: () => void,
-    handleSubmit: (filter: Filter) => any,
+    handleSubmit: (filter: LezioneFilter) => any,
 }
 
 export default function FilterModal({filter, show, handleClose, handleSubmit}: Props) {
