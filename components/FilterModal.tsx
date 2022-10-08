@@ -28,7 +28,7 @@ export default function FilterModal({filter, show, handleClose, handleSubmit}: P
                         cognome: e.currentTarget.cognomeAlunno.value,
                     },
                     startDate: new Date(e.currentTarget.startDate.value),
-                    endDate: e.currentTarget.startDate.value ? new Date(e.currentTarget.endDate.value) : null,
+                    endDate: e.currentTarget.endDate.value ? new Date(e.currentTarget.endDate.value) : null,
                 });
                 handleClose();
             }}>
