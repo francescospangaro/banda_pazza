@@ -1,5 +1,5 @@
 import React, {useMemo, useState} from "react";
-import {Column} from "react-table";
+import { Column, useSortBy, useTable } from "react-table";
 import GenericTable from "@/components/GenericTable";
 import {Button} from "react-bootstrap";
 import {Alunno} from "@/types/api/admin/alunno";
@@ -85,10 +85,10 @@ export default function AlunniTable({content, docenti, onEdit, scrollable}: Prop
         [onEdit, editingAlunni, setEditingAlunni, idToDocente]
     );
 
-    return <GenericTable<TableAlunno> options={{
-        columns,
-        data: tableData,
-        autoResetHiddenColumns: false,
-        scrollable: scrollable,
-    }} />;
+    return <GenericTable<TableAlunno> table={useTable({
+      columns,
+      data: tableData,
+      autoResetHiddenColumns: false,
+      scrollable: scrollable,
+    }, useSortBy)} />;
 }

@@ -1,4 +1,4 @@
-import {Column} from "react-table";
+import { Column, useSortBy, useTable } from "react-table";
 import React, {useMemo} from "react";
 import GenericTable from "@/components/GenericTable"
 import TextareaAutosize from "react-textarea-autosize"
@@ -95,10 +95,10 @@ export default function LezioniTable({content, scrollable, onEditLezione}: Props
         [onEditLezione]
     );
 
-    return <GenericTable<TableLezione> options={{
+    return <GenericTable<TableLezione> table={useTable({
         columns,
         data: tableData,
         autoResetHiddenColumns: false,
         scrollable: scrollable,
-    }} />;
+    }, useSortBy)} />;
 }

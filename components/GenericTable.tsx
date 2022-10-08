@@ -1,14 +1,16 @@
 import React from "react";
-import {useTable, useSortBy, TableOptions} from "react-table";
+import {TableInstance} from "react-table";
 import {Table, Thead, Tbody, Tr, Th, Td} from "react-super-responsive-table";
 import {Row} from "react-bootstrap";
 import useMediaQuery from "@restart/hooks/useMediaQuery";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSort, faSortDown, faSortUp} from "@fortawesome/free-solid-svg-icons";
 
-export default function GenericTable<T extends object = {}>({ options }: { options: TableOptions<T> & { scrollable?: boolean} }) {
-
-    const {getTableProps, getTableBodyProps, headerGroups, rows, prepareRow} = useTable(options, useSortBy);
+export default function GenericTable<T extends object = {}>({ table: tableInstance, scrollable }: {
+  table: TableInstance<T>,
+  scrollable?: boolean
+}) {
+    const {getTableProps, getTableBodyProps, headerGroups, rows, prepareRow} = tableInstance;
 
     const isNotMobile = useMediaQuery("(min-width: 768px)")
     const isDesktop = useMediaQuery("(min-width: 992px)")
@@ -68,7 +70,7 @@ export default function GenericTable<T extends object = {}>({ options }: { optio
         </Table>
     );
 
-    if(options.scrollable !== true)
+    if(!scrollable)
         return table;
 
     return <Row

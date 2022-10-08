@@ -1,5 +1,5 @@
 import React, {useMemo, useState} from "react";
-import {Column} from "react-table";
+import { Column, useSortBy, useTable } from "react-table";
 import GenericTable from "@/components/GenericTable";
 import {Button} from "react-bootstrap";
 import {Docente} from "@/types/api/admin/docente";
@@ -71,10 +71,10 @@ export default function DocentiTable({content, onEdit, scrollable}: Props) {
         [onEdit, editingDocenti, setEditingDocenti]
     );
 
-    return <GenericTable<TableDocente> options={{
+    return <GenericTable<TableDocente> table={useTable({
         columns,
         data: tableData,
         autoResetHiddenColumns: false,
         scrollable: scrollable,
-    }} />;
+    }, useSortBy)} />;
 }
