@@ -10,11 +10,21 @@ export async function zodFetch<RequestValidator extends ZodTypeAny, ResultValida
     responseValidator: ResultValidator,
   }
 ): Promise<{res: Response, parser: () => Promise<ResultValidator['_output']>}> {
+  const validatedBody = init.body ?
+    (() => {
+      const raw = init.body.value;
+      const parsed = init.body.validator.safeParse(raw);
+      if(!parsed.success) {
+        console.error("Zod failed to parse request for", input, ". Request ", raw, ". Reason", parsed.error);
+        return raw;
+      }
+      return parsed.data;
+    })() :
+    undefined;
+
   const res = await fetch(input, {
     ...init,
-    body: init.body ?
-      JSON.stringify(init.body.validator.parse(init.body.value)) :
-      undefined,
+    body: JSON.stringify(validatedBody),
     headers: init.body ?
       {
         ...init.headers,
