@@ -8,6 +8,7 @@ import {createDupesWhereClause} from "@/api/admin/lezione"
 import {Libretto} from '.prisma/client'
 
 const getLezioniDaCompilare = endpoint(
+
     {
         method: 'get',
         responseSchema: Get.ResponseValidator,
@@ -17,6 +18,7 @@ const getLezioniDaCompilare = endpoint(
             where: {
                 docenteId: req.session.user!.id,
                 libretto: { equals: null },
+                orarioDiFine:  { lt: new Date() },
             },
             include: {alunni: true},
         })
