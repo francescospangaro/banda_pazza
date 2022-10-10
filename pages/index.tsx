@@ -145,6 +145,7 @@ const Home: NextPage<Props> = () => {
                                       if (res.ok) {
                                           await mutateLezioni();
                                           await mutateLezioniDaGiustificare();
+                                          await mutateFinireLaCompilazione();
                                           return {success: true, errMsg: ''};
                                       }
 
