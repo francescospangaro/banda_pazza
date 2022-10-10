@@ -2,7 +2,7 @@ import type {GetServerSidePropsResult, NextPage} from 'next'
 import styles from '@/styles/Home.module.css'
 import {User} from "@/types/api/user";
 
-import React, { useMemo, useState } from "react";
+import React, {useMemo, useState} from "react";
 import Layout from "@/components/Layout"
 import LezioniTable from "@/components/LezioniTable";
 
@@ -14,6 +14,7 @@ import RecuperaLezioneModal from "@/components/RecuperaLezioniModal";
 import {zodFetch} from "@/lib/fetch";
 import * as LezioniApi from "@/types/api/lezioni"
 import * as LezioniDaGiustificareApi from "@/types/api/lezioni-da-giustificare"
+//import * as LezioniDaCompilareApi from "@/types/api/lezioni-da-compilare"
 import {isOverlapError} from "@/types/api/admin/lezione";
 
 type Props = {
@@ -22,7 +23,7 @@ type Props = {
 
 export const getServerSideProps = requireAuth<Props>(async (ctx): Promise<GetServerSidePropsResult<Props>> => {
     const docente = ctx.req.session.user!;
-    if(docente?.admin)
+    if (docente?.admin)
         return {
             redirect: {
                 permanent: true,
@@ -72,7 +73,17 @@ const Home: NextPage<Props> = () => {
         async (url: string) => {
             const {parser} = await zodFetch(url, {
                 method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {'Content-Type': 'application/json'},
+                responseValidator: LezioniDaGiustificareApi.Get.ResponseValidator,
+            });
+            return await parser();
+        });
+    const {data: finireLaCompilazione, mutate: mutateFinireLaCompilazione} = useSWR<Lezione[]>(
+        '/api/lezioni-da-compilare',
+        async (url: string) => {
+            const {parser} = await zodFetch(url, {
+                method: 'GET',
+                headers: {'Content-Type': 'application/json'},
                 responseValidator: LezioniDaGiustificareApi.Get.ResponseValidator,
             });
             return await parser();
@@ -89,6 +100,16 @@ const Home: NextPage<Props> = () => {
                             </div>
                         </Row>
                     )}
+
+                    {(finireLaCompilazione?.length ?? 0) > 0 && (
+                        <Row className="align-items-center">
+                            <div className="alert alert-warning" role="alert">
+                                Devi finire di compilare il registro!
+                            </div>
+                        </Row>
+                    )}
+
+
                     <Row className="gap-3 mb-3 w-100">
                         <Col xs="12" md="auto">
                             <Form.Control type="date"
@@ -99,39 +120,40 @@ const Home: NextPage<Props> = () => {
                                           className="w-100"
                                           onChange={(e) => {
                                               setCurrentDate(new Date(e.currentTarget.value));
-                                          }} />
+                                          }}/>
                         </Col>
                         <Col xs="12" md="auto" className="ms-auto">
                             <Button className="w-100"
-                                    disabled= {(lezioniDaRecuperare?.length ?? 0) <= 0}
+                                    disabled={(lezioniDaRecuperare?.length ?? 0) <= 0}
                                     onClick={() => setShowRecuperiModal(true)}
                             >
                                 Recupera
                             </Button>
                         </Col>
                     </Row>
-                    <LezioniTable scrollable content={useMemo(() => lezioni ?? [], [lezioni])} onEditLezione={async (editedLezioneFields) => {
-                        const {res} = await zodFetch('/api/lezioni', {
-                            method: 'PUT',
-                            body: {
-                                value: editedLezioneFields,
-                                validator: LezioniApi.Put.RequestValidator,
-                            },
-                            responseValidator: LezioniApi.Put.ResponseValidator,
-                        });
+                    <LezioniTable scrollable content={useMemo(() => lezioni ?? [], [lezioni])}
+                                  onEditLezione={async (editedLezioneFields) => {
+                                      const {res} = await zodFetch('/api/lezioni', {
+                                          method: 'PUT',
+                                          body: {
+                                              value: editedLezioneFields,
+                                              validator: LezioniApi.Put.RequestValidator,
+                                          },
+                                          responseValidator: LezioniApi.Put.ResponseValidator,
+                                      });
 
-                        if(res.ok) {
-                            await mutateLezioni();
-                            await mutateLezioniDaGiustificare();
-                            return {success: true, errMsg: ''};
-                        }
+                                      if (res.ok) {
+                                          await mutateLezioni();
+                                          await mutateLezioniDaGiustificare();
+                                          return {success: true, errMsg: ''};
+                                      }
 
-                        if(res.status === 404)
-                            return { success: false, errMsg: "Impossibile trovare la lezione" };
-                        if(res.status === 400)
-                            return { success: false, errMsg: "Parametri non validi" };
-                        return { success: false, errMsg: "Errore non previsto" };
-                    }} />
+                                      if (res.status === 404)
+                                          return {success: false, errMsg: "Impossibile trovare la lezione"};
+                                      if (res.status === 400)
+                                          return {success: false, errMsg: "Parametri non validi"};
+                                      return {success: false, errMsg: "Errore non previsto"};
+                                  }}/>
                 </main>
             </Container>
         </Layout>
@@ -149,24 +171,24 @@ const Home: NextPage<Props> = () => {
                                       responseValidator: LezioniDaGiustificareApi.Post.ResponseValidator,
                                   });
 
-                                  if(res.ok) {
+                                  if (res.ok) {
                                       await mutateLezioni();
                                       await mutateLezioniDaGiustificare();
                                       return {success: true, errMsg: ''};
                                   }
 
-                                  if(res.status === 400) {
-                                      const { err } = await parser();
-                                      if(isOverlapError(err))
+                                  if (res.status === 400) {
+                                      const {err} = await parser();
+                                      if (isOverlapError(err))
                                           return {
                                               success: false,
-                                              errMsg: "Ci sono " +  err.count + " sovrapposizioni",
+                                              errMsg: "Ci sono " + err.count + " sovrapposizioni",
                                           };
-                                      return { success: false, errMsg: "Parametri non validi" };
+                                      return {success: false, errMsg: "Parametri non validi"};
                                   }
 
-                                  return { success: false, errMsg: "Errore non previsto" };
-                              }} />
+                                  return {success: false, errMsg: "Errore non previsto"};
+                              }}/>
     </>;
 }
 
