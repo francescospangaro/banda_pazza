@@ -16,7 +16,7 @@ export default function Layout({ children, requiresAuth, loading }: {
         <>
             <Head>
                 <title>C.M. Lurago d&apos;Erba</title>
-                <meta name="description" content="Sito della banda pazzissima" />
+                <meta name="description" content="Registro elettronico Banda Lurago" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
