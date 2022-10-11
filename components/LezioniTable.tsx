@@ -4,6 +4,7 @@ import GenericTable from "@/components/GenericTable"
 import TextareaAutosize from "react-textarea-autosize"
 import {Form} from "react-bootstrap"
 import {Lezione, Libretto} from "@/types/api/lezioni"
+import {TipoLezione} from "@/types/api/admin/lezione"
 
 type Props = {
     content: Lezione[],
@@ -20,7 +21,7 @@ type TableLezione = {
     note?: string,
     recuperataDa?: {id: number, orarioDiInizio: Date, orarioDiFine: Date},
     recuperoDi?: {id: number, orarioDiInizio: Date, orarioDiFine: Date},
-    solfeggio: boolean,
+    tipoLezione: TipoLezione,
 }
 
 export default function LezioniTable({content, scrollable, onEditLezione}: Props) {
@@ -40,7 +41,7 @@ export default function LezioniTable({content, scrollable, onEditLezione}: Props
                 ""),
         recuperataDa: lezione.recuperataDa,
         recuperoDi: lezione.recuperoDi,
-        solfeggio: lezione.solfeggio,
+        tipoLezione: lezione.tipoLezione,
     }}), [content]);
     const columns = useMemo<Column<TableLezione>[]>(
         () => [
@@ -77,7 +78,7 @@ export default function LezioniTable({content, scrollable, onEditLezione}: Props
                     >
                         <option value="">---</option>
                         <option value="PRESENTE">Presente</option>
-                        {!props.row.original.solfeggio && (<>
+                        {props.row.original.tipoLezione=="NORMALE" && (<>
                             <option value="ASSENTE_GIUSTIFICATO">Assente Giustificato</option>
                             <option value="ASSENTE_NON_GIUSTIFICATO">Assente non giustificato</option>
                         </>)}
