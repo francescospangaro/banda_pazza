@@ -20,6 +20,7 @@ type TableLezione = {
     note?: string,
     recuperataDa?: {id: number, orarioDiInizio: Date, orarioDiFine: Date},
     recuperoDi?: {id: number, orarioDiInizio: Date, orarioDiFine: Date},
+    solfeggio: boolean,
 }
 
 export default function LezioniTable({content, scrollable, onEditLezione}: Props) {
@@ -39,6 +40,7 @@ export default function LezioniTable({content, scrollable, onEditLezione}: Props
                 ""),
         recuperataDa: lezione.recuperataDa,
         recuperoDi: lezione.recuperoDi,
+        solfeggio: lezione.solfeggio,
     }}), [content]);
     const columns = useMemo<Column<TableLezione>[]>(
         () => [
@@ -75,8 +77,10 @@ export default function LezioniTable({content, scrollable, onEditLezione}: Props
                     >
                         <option value="">---</option>
                         <option value="PRESENTE">Presente</option>
-                        <option value="ASSENTE_GIUSTIFICATO">Assente Giustificato</option>
-                        <option value="ASSENTE_NON_GIUSTIFICATO">Assente non giustificato</option>
+                        {!props.row.original.solfeggio && (<>
+                            <option value="ASSENTE_GIUSTIFICATO">Assente Giustificato</option>
+                            <option value="ASSENTE_NON_GIUSTIFICATO">Assente non giustificato</option>
+                        </>)}
                         <option value="LEZIONE_SALTATA">Lezione saltata</option>
                     </Form.Select>;
                 },

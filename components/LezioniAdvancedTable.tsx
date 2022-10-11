@@ -18,6 +18,7 @@ type TableLezione = {
     note?: string,
     recuperataDa?: {id: number, orarioDiInizio: Date, orarioDiFine: Date},
     recuperoDi?: {id: number, orarioDiInizio: Date, orarioDiFine: Date},
+    solfeggio: boolean,
     selectable: boolean,
     selected: boolean,
 }
@@ -63,6 +64,7 @@ export default function LezioniAdvancedTable(
                 ""),
         recuperataDa: lezione.recuperataDa,
         recuperoDi: lezione.recuperoDi,
+        solfeggio: lezione.solfeggio,
         selectable: lezione.selectable,
         selected: lezione.selected,
     }}), [content]);
@@ -122,8 +124,10 @@ export default function LezioniAdvancedTable(
                     >
                         <option value="">---</option>
                         <option value="PRESENTE">Presente</option>
-                        <option value="ASSENTE_GIUSTIFICATO">Assente Giustificato</option>
-                        <option value="ASSENTE_NON_GIUSTIFICATO">Assente non giustificato</option>
+                        {!props.row.original.solfeggio && (<>
+                          <option value="ASSENTE_GIUSTIFICATO">Assente Giustificato</option>
+                          <option value="ASSENTE_NON_GIUSTIFICATO">Assente non giustificato</option>
+                        </>)}
                         <option value="LEZIONE_SALTATA">Lezione saltata</option>
                     </Form.Select>;
                 },

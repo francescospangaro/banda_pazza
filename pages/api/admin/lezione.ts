@@ -51,10 +51,16 @@ const addLezioni = endpoint(
                   docenteId: lezione.docenteId,
                   orarioDiInizio: lezione.orarioDiInizio,
                   orarioDiFine: lezione.orarioDiFine,
+                  solfeggio: lezione.solfeggio,
               });
           })
           return map;
-      }, new Map<number, { docenteId: number, orarioDiInizio: Date, orarioDiFine: Date, }[]>()).entries());
+      }, new Map<number, {
+        docenteId: number,
+        orarioDiInizio: Date,
+        orarioDiFine: Date,
+        solfeggio: boolean,
+      }[]>()).entries());
 
       return (await prisma.$transaction(async (tx) => {
           const dupesWhereClause = createDupesWhereClause(lezioni);

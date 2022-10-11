@@ -55,6 +55,7 @@ export default function AddLezioniModal({ docenti, alunni: allAlunni, show, hand
                         alunniIds: alunni.map(alunno => Number(alunno)),
                         orario: new Date(startDate),
                         durataInMin: Number(e.currentTarget.durata.value),
+                        solfeggio: Boolean(e.currentTarget.solfeggio.value),
                     });
                     startDate.setDate(startDate.getDate() + 7);
                 } while(endDate.getTime() - startDate.getTime() >= 0);
@@ -79,6 +80,12 @@ export default function AddLezioniModal({ docenti, alunni: allAlunni, show, hand
                                     })}
                                 </>
                             </Form.Select>
+                        </Col>
+                        <Col xs="12">
+                            <Form.Check
+                              type="checkbox"
+                              name="solfeggio"
+                              label="Solfeggio"/>
                         </Col>
                         <Col xs="12">
                             <Row className="g-1">

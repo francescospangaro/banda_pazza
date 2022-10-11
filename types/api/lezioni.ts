@@ -22,6 +22,7 @@ export const LezioneValidator = z.object({
   libretto: LibrettoValidator.optional(),
   recuperataDa: z.object({id: z.number(), orarioDiInizio: DateOrStringValidator, orarioDiFine: DateOrStringValidator}).optional(),
   recuperoDi: z.object({id: z.number(), orarioDiInizio: DateOrStringValidator, orarioDiFine: DateOrStringValidator}).optional(),
+  solfeggio: z.boolean(),
 });
 export type Lezione = z.infer<typeof LezioneValidator>;
 

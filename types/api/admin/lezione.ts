@@ -6,6 +6,7 @@ export const LezioneToGenerateValidator = z.object({
   docenteId: z.number(),
   orario: DateOrStringValidator,
   durataInMin: z.number(),
+  solfeggio: z.boolean(),
 });
 export type LezioneToGenerate = z.infer<typeof LezioneToGenerateValidator>;
 
