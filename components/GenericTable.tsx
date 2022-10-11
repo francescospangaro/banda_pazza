@@ -43,18 +43,40 @@ export default function GenericTable<T extends object = {}>({ table: tableInstan
                 {rows.map((row) => {
                     prepareRow(row);
                     const { key, ...restRowProps } = row.getRowProps();
-                    return (
-                        <Tr key={key} {...restRowProps}>
-                            {row.cells.map((cell) => {
-                                const { key, ...restCellProps } = cell.getCellProps();
-                                return (
-                                    <Td key={key} {...restCellProps}>
-                                        {cell.render("Cell")}
-                                    </Td>
-                                );
-                            })}
-                        </Tr>
-                    );
+                    const rows = row.cells.reduce((map, cell) => {
+                      map.set(cell, cell.column.rowSpan ? cell.column.rowSpan({
+                        ...tableInstance,
+                        column: cell.column,
+                        row,
+                        cell,
+                        value: cell.value,
+                      }) : 1);
+                      return map;
+                    }, new Map<any, number>());
+                    const maxRows = Array.from(rows.values()).reduce((p, v) => p > v ? p : v);
+
+                    return Array.from(Array(maxRows).keys()).map(cellRowIndex => (
+                      <Tr key={key + '_' + cellRowIndex} {...restRowProps}>
+                        {row.cells.map((cell) => {
+                          const {key, ...restCellProps} = cell.getCellProps();
+                          const cellRows = (cell.column.rowSpan ? rows.get(cell) : undefined) ?? 1;
+                          if(cellRows < cellRowIndex + 1)
+                            return null;
+
+                          const isLastRowCell = cellRows == cellRowIndex + 1;
+                          const rowSpan = isLastRowCell ? (maxRows - cellRows) + 1 : 1;
+
+                          if(cell.column.RowSpanCells)
+                            cell.column.Cell = cell.column.RowSpanCells as any;
+
+                          return (
+                            <Td key={key} rowSpan={rowSpan} {...restCellProps}>
+                              {cell.render("Cell", { cellRowIndex, cellMaxRows: maxRows })}
+                            </Td>
+                          );
+                        })}
+                      </Tr>
+                    ));
                 })}
             </Tbody>
 

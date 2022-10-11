@@ -1,6 +1,9 @@
 // See https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/react-table/Readme.md
 
 import {
+    CellProps,
+    FilterProps,
+    Renderer,
     UseColumnOrderInstanceProps,
     UseColumnOrderState,
     UseExpandedHooks,
@@ -96,6 +99,13 @@ declare module 'react-table' {
             UseRowSelectState<D>,
             UseRowStateState<D>,
             UseSortByState<D> {}
+
+    export type UseRowSpanColumnOptions<D extends object = {}, V = any> = {
+        rowSpan?: (props: CellProps<D, V>) => number;
+        RowSpanCells?: Renderer<CellProps<D, V> & { cellRowIndex: number, cellMaxRows: number }>;
+    };
+
+    export interface ColumnInterfaceBasedOnValue<D extends object = {}, V = any> extends UseRowSpanColumnOptions<D, V> {}
 
     export interface ColumnInterface<D extends Record<string, unknown> = Record<string, unknown>>
         extends UseFiltersColumnOptions<D>,
