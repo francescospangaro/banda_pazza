@@ -101,10 +101,12 @@ const Home: NextPage<Props> = () => {
                         </Row>
                     )}
 
-                    {(finireLaCompilazione?.length ?? 0) > 0 && (
+                    {finireLaCompilazione && (finireLaCompilazione?.length ?? 0) > 0 && (
                         <Row className="align-items-center">
                             <div className="alert alert-warning" role="alert">
-                                Devi finire di compilare il registro!
+                                Devi finire di compilare la lezione: {
+                                 finireLaCompilazione[finireLaCompilazione.length-1].orarioDiInizio.toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit' })
+                                }
                             </div>
                         </Row>
                     )}
