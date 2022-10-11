@@ -10,7 +10,11 @@ export const LezioneDiRecuperoValidator = z.object({
 export type LezioneDiRecupero = z.infer<typeof LezioneDiRecuperoValidator>;
 
 export namespace Get {
-  export const ResponseValidator = LezioneValidator.array();
+  export const ResponseValidator = LezioneValidator.omit({
+    libretto: true,
+    recuperataDa: true,
+    recuperoDi: true,
+  }).array();
 }
 
 export namespace Post {

@@ -33,6 +33,7 @@ const getLezioniDaRecuperare = endpoint(
                   }}),
                   orarioDiInizio: lezione.orarioDiInizio,
                   orarioDiFine: lezione.orarioDiFine,
+                  solfeggio: lezione.solfeggio,
               }
           })
       };

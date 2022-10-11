@@ -1,14 +1,10 @@
-
 import {endpoint, asHandler} from "next-better-api";
 import {withIronSessionApiRoute} from 'iron-session/next'
 import {sessionOptions} from '@/lib/session'
 import {prisma} from '@/lib/database'
 import {Get} from "@/types/api/lezioni-da-compilare";
-import {createDupesWhereClause} from "@/api/admin/lezione"
-import {Libretto} from '.prisma/client'
 
 const getLezioniDaCompilare = endpoint(
-
     {
         method: 'get',
         responseSchema: Get.ResponseValidator,
@@ -34,6 +30,7 @@ const getLezioniDaCompilare = endpoint(
                     }}),
                     orarioDiInizio: lezione.orarioDiInizio,
                     orarioDiFine: lezione.orarioDiFine,
+                    solfeggio: lezione.solfeggio,
                 }
             })
         };
