@@ -1,6 +1,9 @@
 import { Modal, Form, Button, Row, Col, InputGroup } from "react-bootstrap";
 import { useState } from "react";
-import { LezioneToGenerate as GeneratedLezione } from "@/types/api/admin/lezione";
+import {
+  LezioneToGenerate as GeneratedLezione,
+  TipoLezione,
+} from "@/types/api/admin/lezione";
 
 type Props = {
   docenti: {
@@ -64,7 +67,13 @@ export default function AddLezioniModal({
               alunniIds: alunni.map((alunno) => Number(alunno)),
               orario: new Date(startDate),
               durataInMin: Number(e.currentTarget.durata.value),
-              solfeggio: Boolean(e.currentTarget.solfeggio.value),
+              tipoLezione: (Boolean(e.currentTarget.solfeggio.value)
+                ? TipoLezione.SOLFEGGIO
+                : Boolean(e.currentTarget.koala.value)
+                ? TipoLezione.KOALA
+                : Boolean(e.currentTarget.tippete.value)
+                ? TipoLezione.TIPPETE
+                : TipoLezione.NORMALE) as TipoLezione,
             });
             startDate.setDate(startDate.getDate() + 7);
           } while (endDate.getTime() - startDate.getTime() >= 0);
@@ -100,7 +109,27 @@ export default function AddLezioniModal({
               </Form.Select>
             </Col>
             <Col xs="12">
-              <Form.Check type="checkbox" name="solfeggio" label="Solfeggio" />
+              <div className="mb-3">
+                <Form.Check
+                  inline
+                  label="Normale"
+                  name="Normale"
+                  type="radio"
+                />
+                <Form.Check
+                  inline
+                  label="Solfeggio"
+                  name="Solfeggio"
+                  type="radio"
+                />
+                <Form.Check
+                  inline
+                  label="Tippete"
+                  name="Tippete"
+                  type="radio"
+                />
+                <Form.Check inline name="Koala" label="Koala" type="radio" />
+              </div>
             </Col>
             <Col xs="12">
               <Row className="g-1">

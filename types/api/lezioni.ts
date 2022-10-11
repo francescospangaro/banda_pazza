@@ -16,6 +16,17 @@ export const LibrettoValidator = z.enum([
 ]);
 export type Libretto = z.infer<typeof LibrettoValidator>;
 
+export const TipoLezione = {
+  NORMALE: 'NORMALE',
+  SOLFEGGIO: 'SOLFEGGIO',
+  TIPPETE: 'TIPPETE',
+  KOALA: 'KOALA'
+  //add
+};
+
+export const TipoLezioneValidator = z.enum(['NORMALE', 'SOLFEGGIO', 'TIPPETE', 'KOALA']);
+export type TipoLezione = z.infer<typeof TipoLezioneValidator>;
+
 export const LezioneValidator = z.object({
   id: z.number(),
   alunni: z
@@ -41,7 +52,7 @@ export const LezioneValidator = z.object({
       orarioDiFine: DateOrStringValidator,
     })
     .optional(),
-  solfeggio: z.boolean(),
+  tipoLezione: TipoLezioneValidator,
 });
 export type Lezione = z.infer<typeof LezioneValidator>;
 
