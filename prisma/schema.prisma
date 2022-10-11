@@ -12,26 +12,26 @@ datasource db {
 }
 
 model Docente {
-    id              Int         @id @default(autoincrement())
-    cf              String      @unique
+    id              Int          @id @default(autoincrement())
+    cf              String       @unique
     nome            String
     cognome         String
-    email           String      @unique
+    email           String       @unique
     alunni          Alunno[]
-    admin           Boolean     @default(false)
+    admin           Boolean      @default(false)
     password        String
     lezioni         Lezione[]
-//    oreDiLavoro     Int         @default(0)
-//    oreRecuperare   Int         @default(0)
+//    oreDiLavoro     Int        @default(0)
+//    oreRecuperare   Int        @default(0)
 }
 
 model Alunno {
-    id             Int     @id @default(autoincrement())
-    cf             String  @unique
+    id             Int           @id @default(autoincrement())
+    cf             String        @unique
     nome           String
     cognome        String
-    email          String  @unique
-    docente        Docente @relation(fields: [docenteId], references: [id])
+    email          String        @unique
+    docente        Docente       @relation(fields: [docenteId], references: [id])
     docenteId      Int
     annoCorso      Int
     annoIscrizione String
@@ -39,19 +39,19 @@ model Alunno {
 }
 
 model Lezione {
-    id             Int       @id @default(autoincrement())
-    docente        Docente   @relation(fields: [docenteId], references: [id])
+    id             Int           @id @default(autoincrement())
+    docente        Docente       @relation(fields: [docenteId], references: [id])
     docenteId      Int
     alunni         Alunno[]
     orarioDiInizio DateTime
     orarioDiFine   DateTime
     libretto       Libretto?
-    recuperoId     Int?      @unique
-    recuperoDi     Lezione?  @relation("LezioneDiRecupero", fields: [recuperoId], references: [id])
-    recuperataDa   Lezione?  @relation("LezioneDiRecupero")
-    solfeggio      Boolean   @default(false)
+    recuperoId     Int?          @unique
+    recuperoDi     Lezione?      @relation("LezioneDiRecupero", fields: [recuperoId], references: [id])
+    recuperataDa   Lezione?      @relation("LezioneDiRecupero")
+    tipoLezione    TipoLezione   @default(NORMALE)
 
-    @@unique([docenteId, orarioDiInizio, orarioDiFine])
+    @@unique([docenteId, orarioDiInizio, orarioDiFine, tipoLezione])
 }
 
 enum Libretto {
@@ -59,4 +59,12 @@ enum Libretto {
   ASSENTE_GIUSTIFICATO
   ASSENTE_NON_GIUSTIFICATO
   LEZIONE_SALTATA
+}
+
+enum TipoLezione {
+  NORMALE
+  SOLFEGGIO
+  TIPPETE
+  KOALA
+// CORSO_DA_AGGIUNGERE
 }
