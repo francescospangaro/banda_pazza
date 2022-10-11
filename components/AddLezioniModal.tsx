@@ -55,9 +55,9 @@ export default function AddLezioniModal({docenti, alunni: allAlunni, show, handl
                         alunniIds: alunni.map(alunno => Number(alunno)),
                         orario: new Date(startDate),
                         durataInMin: Number(e.currentTarget.durata.value),
-                        tipoLezione: (Boolean(e.currentTarget.solfeggio.value) ? TipoLezione.SOLFEGGIO :
-                            Boolean(e.currentTarget.koala.value) ? TipoLezione.KOALA :
-                                Boolean(e.currentTarget.tippete.value) ? TipoLezione.TIPPETE :
+                        tipoLezione: (String(e.currentTarget.radio_group.value) === ('SOLFEGGIO') ? TipoLezione.SOLFEGGIO :
+                            String(e.currentTarget.radio_group.value) === ('KOALA') ? TipoLezione.KOALA :
+                                String(e.currentTarget.radio_group.value) === ('TIPPETE') ? TipoLezione.TIPPETE :
                                     TipoLezione.NORMALE) as TipoLezione,
                     });
                     startDate.setDate(startDate.getDate() + 7);
@@ -91,26 +91,30 @@ export default function AddLezioniModal({docenti, alunni: allAlunni, show, handl
                                 <Form.Check
                                     inline
                                     label="Normale"
-                                    name="Normale"
+                                    name="radio_group"
                                     type="radio"
+                                    value="NORMALE"
                                 />
                                 <Form.Check
                                     inline
                                     label="Solfeggio"
-                                    name="Solfeggio"
+                                    name="radio_group"
                                     type="radio"
+                                    value="SOLFEGGIO"
                                 />
                                 <Form.Check
                                     inline
                                     label="Tippete"
-                                    name="Tippete"
+                                    name="radio_group"
                                     type="radio"
+                                    value="TIPPETE"
                                 />
                                 <Form.Check
                                     inline
-                                    name="Koala"
                                     label="Koala"
+                                    name="radio_group"
                                     type="radio"
+                                    value="KOALA"
                                 />
                             </div>
                         </Col>

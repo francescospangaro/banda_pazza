@@ -43,7 +43,7 @@ const getLezioni = endpoint(
                       orarioDiInizio: lezione.recuperoDi.orarioDiInizio,
                       orarioDiFine: lezione.recuperoDi.orarioDiFine,
                   } : undefined,
-                  solfeggio: lezione.solfeggio,
+                  tipoLezione: lezione.tipoLezione,
               }
           })
       };

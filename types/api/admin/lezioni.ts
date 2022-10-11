@@ -1,6 +1,7 @@
 import {z} from "zod";
 import {LibrettoValidator} from "@/types/api/lezioni";
 import {DateOrStringValidator} from "@/types/zod";
+import {TipoLezioneValidator} from "@/types/api/lezioni";
 
 export const LezioneValidator = z.object({
   id: z.number(),
@@ -16,10 +17,10 @@ export const LezioneValidator = z.object({
   }),
   orarioDiInizio: DateOrStringValidator,
   orarioDiFine: DateOrStringValidator,
+  tipoLezione: TipoLezioneValidator,
   libretto: LibrettoValidator.optional(),
   recuperataDa: z.object({id: z.number(), orarioDiInizio: DateOrStringValidator, orarioDiFine: DateOrStringValidator}).optional(),
   recuperoDi: z.object({id: z.number(), orarioDiInizio: DateOrStringValidator, orarioDiFine: DateOrStringValidator}).optional(),
-  solfeggio: z.boolean(),
 });
 export type Lezione = z.infer<typeof LezioneValidator>;
 
