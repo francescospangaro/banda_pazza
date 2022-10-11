@@ -67,11 +67,12 @@ export default function AddLezioniModal({
               alunniIds: alunni.map((alunno) => Number(alunno)),
               orario: new Date(startDate),
               durataInMin: Number(e.currentTarget.durata.value),
-              tipoLezione: (Boolean(e.currentTarget.solfeggio.value)
+              tipoLezione: (String(e.currentTarget.radio_group.value) ===
+              "SOLFEGGIO"
                 ? TipoLezione.SOLFEGGIO
-                : Boolean(e.currentTarget.koala.value)
+                : String(e.currentTarget.radio_group.value) === "KOALA"
                 ? TipoLezione.KOALA
-                : Boolean(e.currentTarget.tippete.value)
+                : String(e.currentTarget.radio_group.value) === "TIPPETE"
                 ? TipoLezione.TIPPETE
                 : TipoLezione.NORMALE) as TipoLezione,
             });
@@ -113,22 +114,31 @@ export default function AddLezioniModal({
                 <Form.Check
                   inline
                   label="Normale"
-                  name="Normale"
+                  name="radio_group"
                   type="radio"
+                  value="NORMALE"
                 />
                 <Form.Check
                   inline
                   label="Solfeggio"
-                  name="Solfeggio"
+                  name="radio_group"
                   type="radio"
+                  value="SOLFEGGIO"
                 />
                 <Form.Check
                   inline
                   label="Tippete"
-                  name="Tippete"
+                  name="radio_group"
                   type="radio"
+                  value="TIPPETE"
                 />
-                <Form.Check inline name="Koala" label="Koala" type="radio" />
+                <Form.Check
+                  inline
+                  label="Koala"
+                  name="radio_group"
+                  type="radio"
+                  value="KOALA"
+                />
               </div>
             </Col>
             <Col xs="12">

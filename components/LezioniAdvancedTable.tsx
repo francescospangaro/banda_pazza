@@ -5,6 +5,7 @@ import TextareaAutosize from "react-textarea-autosize";
 import { Column, useTable, useSortBy, usePagination } from "react-table";
 import { Lezione } from "@/types/api/admin/lezioni";
 import { Libretto } from "@/types/api/lezioni";
+import { TipoLezione } from "@/types/api/admin/lezione"
 
 type TableLezione = {
   in: Lezione;
@@ -18,7 +19,7 @@ type TableLezione = {
   note?: string;
   recuperataDa?: { id: number; orarioDiInizio: Date; orarioDiFine: Date };
   recuperoDi?: { id: number; orarioDiInizio: Date; orarioDiFine: Date };
-  solfeggio: boolean;
+  tipoLezione: TipoLezione,
   selectable: boolean;
   selected: boolean;
 };
@@ -80,7 +81,7 @@ export default function LezioniAdvancedTable({
               : ""),
           recuperataDa: lezione.recuperataDa,
           recuperoDi: lezione.recuperoDi,
-          solfeggio: lezione.solfeggio,
+          tipoLezione: lezione.tipoLezione,
           selectable: lezione.selectable,
           selected: lezione.selected,
         };
@@ -164,7 +165,7 @@ export default function LezioniAdvancedTable({
             >
               <option value="">---</option>
               <option value="PRESENTE">Presente</option>
-              {!props.row.original.solfeggio && (
+              {props.row.original.tipoLezione === "NORMALE" && (
                 <>
                   <option value="ASSENTE_GIUSTIFICATO">
                     Assente Giustificato

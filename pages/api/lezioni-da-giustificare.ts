@@ -37,7 +37,7 @@ const getLezioniDaRecuperare = endpoint(
           }),
           orarioDiInizio: lezione.orarioDiInizio,
           orarioDiFine: lezione.orarioDiFine,
-          solfeggio: lezione.solfeggio,
+          tipoLezione: lezione.tipoLezione,
         };
       }),
     };
@@ -98,6 +98,7 @@ const recuperaLezione = endpoint(
                   docenteId: overlappingLesson.docenteId,
                   orarioDiInizio: overlappingLesson.orarioDiInizio,
                   orarioDiFine: overlappingLesson.orarioDiFine,
+                  tipoLezione: overlappingLesson.tipoLezione,
                 };
               })(),
             },

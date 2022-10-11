@@ -108,7 +108,7 @@ const getFilteredLezioni = endpoint(
                     orarioDiFine: lezione.recuperoDi.orarioDiFine,
                   }
                 : undefined,
-              solfeggio: lezione.solfeggio,
+              tipoLezione: lezione.tipoLezione,
             };
           }),
         },

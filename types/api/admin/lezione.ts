@@ -5,7 +5,7 @@ export const TipoLezione = {
   NORMALE: 'NORMALE',
   SOLFEGGIO: 'SOLFEGGIO',
   TIPPETE: 'TIPPETE',
-  KOALA: 'KOALA'
+  KOALA: 'KOALA',
   //add
 };
 
@@ -28,6 +28,7 @@ export const OverlapErrorValidator = z.object({
     docenteId: z.number(),
     orarioDiInizio: DateOrStringValidator,
     orarioDiFine: DateOrStringValidator,
+    tipoLezione: TipoLezioneValidator,
   }),
 });
 export type OverlapError = z.infer<typeof OverlapErrorValidator>;
