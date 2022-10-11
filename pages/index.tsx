@@ -14,7 +14,7 @@ import RecuperaLezioneModal from "@/components/RecuperaLezioniModal";
 import {zodFetch} from "@/lib/fetch";
 import * as LezioniApi from "@/types/api/lezioni"
 import * as LezioniDaGiustificareApi from "@/types/api/lezioni-da-giustificare"
-//import * as LezioniDaCompilareApi from "@/types/api/lezioni-da-compilare"
+import * as LezioniDaCompilareApi from "@/types/api/lezioni-da-compilare"
 import {isOverlapError} from "@/types/api/admin/lezione";
 
 type Props = {
@@ -84,7 +84,7 @@ const Home: NextPage<Props> = () => {
             const {parser} = await zodFetch(url, {
                 method: 'GET',
                 headers: {'Content-Type': 'application/json'},
-                responseValidator: LezioniDaGiustificareApi.Get.ResponseValidator,
+                responseValidator: LezioniDaCompilareApi.Get.ResponseValidator,
             });
             return await parser();
         });
