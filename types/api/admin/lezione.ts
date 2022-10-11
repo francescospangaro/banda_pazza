@@ -1,5 +1,5 @@
-import {z} from "zod";
-import {DateOrStringValidator} from "@/types/zod";
+import { z } from "zod";
+import { DateOrStringValidator } from "@/types/zod";
 
 export const LezioneToGenerateValidator = z.object({
   alunniIds: z.number().array(),

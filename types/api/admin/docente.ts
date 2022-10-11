@@ -1,4 +1,4 @@
-import {z} from "zod";
+import { z } from "zod";
 
 export const DocenteToGenerateValidator = z.object({
   nome: z.string(),
@@ -28,10 +28,11 @@ export namespace Post {
 }
 
 export namespace Put {
-  export const RequestValidator = DocenteValidator
-    .merge(z.object({password: z.string()}))
+  export const RequestValidator = DocenteValidator.merge(
+    z.object({ password: z.string() })
+  )
     .partial()
-    .omit({id: true})
-    .merge(z.object({id: z.number()}));
+    .omit({ id: true })
+    .merge(z.object({ id: z.number() }));
   export const ResponseValidator = DocenteValidator;
 }

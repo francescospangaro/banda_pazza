@@ -1,7 +1,7 @@
-import {z} from "zod";
-import {LezioneValidator} from "@/types/api/lezioni";
-import {OverlapErrorValidator} from "@/types/api/admin/lezione";
-import {DateOrStringValidator} from "@/types/zod";
+import { z } from "zod";
+import { LezioneValidator } from "@/types/api/lezioni";
+import { OverlapErrorValidator } from "@/types/api/admin/lezione";
+import { DateOrStringValidator } from "@/types/zod";
 
 export const LezioneDiRecuperoValidator = z.object({
   idDaRecuperare: z.number(),
@@ -19,5 +19,7 @@ export namespace Get {
 
 export namespace Post {
   export const RequestValidator = LezioneDiRecuperoValidator;
-  export const ResponseValidator = z.object({err: OverlapErrorValidator.optional()});
+  export const ResponseValidator = z.object({
+    err: OverlapErrorValidator.optional(),
+  });
 }

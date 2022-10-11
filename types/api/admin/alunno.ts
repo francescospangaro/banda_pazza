@@ -1,4 +1,4 @@
-import {z} from "zod"
+import { z } from "zod";
 
 export const AlunnoToGenerateValidator = z.object({
   nome: z.string(),
@@ -7,7 +7,7 @@ export const AlunnoToGenerateValidator = z.object({
   cf: z.string(),
   docenteId: z.number(),
 });
-export type AlunnoToGenerate = z.infer<typeof AlunnoToGenerateValidator>
+export type AlunnoToGenerate = z.infer<typeof AlunnoToGenerateValidator>;
 
 export const AlunnoValidator = z.object({
   id: z.number(),
@@ -17,7 +17,7 @@ export const AlunnoValidator = z.object({
   cf: z.string(),
   docenteId: z.number(),
 });
-export type Alunno = z.infer<typeof AlunnoValidator>
+export type Alunno = z.infer<typeof AlunnoValidator>;
 
 export namespace Get {
   export const ResponseValidator = z.array(AlunnoValidator);
@@ -30,7 +30,7 @@ export namespace Post {
 
 export namespace Put {
   export const RequestValidator = AlunnoValidator.partial()
-    .omit({id: true})
+    .omit({ id: true })
     .merge(z.object({ id: z.number() }));
   export const ResponseValidator = AlunnoValidator;
 }
