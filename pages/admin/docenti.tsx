@@ -30,7 +30,7 @@ export const getServerSideProps = requireAuth<Props>(async () => {
         WHERE paid = false
           AND (libretto = "PRESENTE" OR libretto = "ASSENTE_NON_GIUSTIFICATO")
           AND orarioDiFine < CAST(${new Date().toJSON()} as DATETIME)
-        GROUP BY lezione.docenteId
+        GROUP BY Lezione.docenteId
     `
   )
     .map((entry) => {
