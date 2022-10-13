@@ -6,7 +6,7 @@
 */
 
 -- AlterTable
-ALTER TABLE `lezione` ADD COLUMN `tipoLezione` ENUM('NORMALE', 'SOLFEGGIO', 'TIPPETE', 'KOALA') NOT NULL DEFAULT 'NORMALE';
+ALTER TABLE `Lezione` ADD COLUMN `tipoLezione` ENUM('NORMALE', 'SOLFEGGIO', 'TIPPETE', 'KOALA') NOT NULL DEFAULT 'NORMALE';
 
 -- CreateIndex
 CREATE UNIQUE INDEX `Lezione_docenteId_orarioDiInizio_orarioDiFine_tipoLezione_key` ON `Lezione`(`docenteId`, `orarioDiInizio`, `orarioDiFine`, `tipoLezione`);
