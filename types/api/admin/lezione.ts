@@ -1,12 +1,23 @@
 import { z } from "zod";
 import { DateOrStringValidator } from "@/types/zod";
 
+export const TipoLezione = {
+  NORMALE: 'NORMALE',
+  SOLFEGGIO: 'SOLFEGGIO',
+  TIPPETE: 'TIPPETE',
+  KOALA: 'KOALA',
+  //add
+};
+
+export const TipoLezioneValidator = z.enum([ 'NORMALE', 'SOLFEGGIO', 'TIPPETE', 'KOALA' ]);
+export type TipoLezione = z.infer<typeof TipoLezioneValidator>;
+
 export const LezioneToGenerateValidator = z.object({
   alunniIds: z.number().array(),
   docenteId: z.number(),
   orario: DateOrStringValidator,
   durataInMin: z.number(),
-  solfeggio: z.boolean(),
+  tipoLezione: TipoLezioneValidator,
 });
 export type LezioneToGenerate = z.infer<typeof LezioneToGenerateValidator>;
 
@@ -17,6 +28,7 @@ export const OverlapErrorValidator = z.object({
     docenteId: z.number(),
     orarioDiInizio: DateOrStringValidator,
     orarioDiFine: DateOrStringValidator,
+    tipoLezione: TipoLezioneValidator,
   }),
 });
 export type OverlapError = z.infer<typeof OverlapErrorValidator>;

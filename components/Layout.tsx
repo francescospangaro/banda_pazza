@@ -22,7 +22,7 @@ export default function Layout({
     <>
       <Head>
         <title>C.M. Lurago d&apos;Erba</title>
-        <meta name="description" content="Sito della banda pazzissima" />
+        <meta name="description" content="Registro elettronico Banda Lurago" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -62,9 +62,11 @@ export default function Layout({
         :global(*, *::before, *::after) {
           box-sizing: border-box;
         }
+
         :global(html, body) {
           margin: 0;
         }
+
         :global(body) {
           margin: 0;
           color: #333;
@@ -72,6 +74,7 @@ export default function Layout({
             "Helvetica Neue", Arial, Noto Sans, sans-serif, "Apple Color Emoji",
             "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
         }
+
         :global(#__next) {
           height: 100vh;
           min-height: 100vh;
@@ -79,6 +82,7 @@ export default function Layout({
           display: grid;
           grid-template-rows: auto minmax(0, 1fr);
         }
+
         .layout-container {
           flex: 1 1 auto;
           max-width: 75rem;

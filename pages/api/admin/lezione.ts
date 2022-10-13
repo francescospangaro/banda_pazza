@@ -3,6 +3,7 @@ import { withIronSessionApiRoute } from "iron-session/next";
 import { sessionOptions } from "@/lib/session";
 import { prisma } from "@/lib/database";
 import { Post, Delete } from "@/types/api/admin/lezione";
+import { TipoLezione } from "@/types/api/admin/lezione";
 
 export function createDupesWhereClause(
   lezioni: {
@@ -76,7 +77,7 @@ const addLezioni = endpoint(
                 docenteId: lezione.docenteId,
                 orarioDiInizio: lezione.orarioDiInizio,
                 orarioDiFine: lezione.orarioDiFine,
-                solfeggio: lezione.solfeggio,
+                tipoLezione: lezione.tipoLezione,
               });
             });
             return map;
@@ -87,7 +88,7 @@ const addLezioni = endpoint(
               docenteId: number;
               orarioDiInizio: Date;
               orarioDiFine: Date;
-              solfeggio: boolean;
+              tipoLezione: TipoLezione;
             }[]
           >()
         )
@@ -121,6 +122,7 @@ const addLezioni = endpoint(
                   docenteId: overlappingLesson.docenteId,
                   orarioDiInizio: overlappingLesson.orarioDiInizio,
                   orarioDiFine: overlappingLesson.orarioDiFine,
+                  tipoLezione: overlappingLesson.tipoLezione,
                 };
               })(),
             },
@@ -134,7 +136,7 @@ const addLezioni = endpoint(
               lezioni: {
                 connectOrCreate: lezioniIn.map((lezione) => {
                   return {
-                    where: { docenteId_orarioDiInizio_orarioDiFine: lezione },
+                    where: { docenteId_orarioDiInizio_orarioDiFine_tipoLezione: lezione },
                     create: lezione,
                   };
                 }),

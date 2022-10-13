@@ -1,6 +1,9 @@
 import { Modal, Form, Button, Row, Col, InputGroup } from "react-bootstrap";
 import { useState } from "react";
-import { LezioneToGenerate as GeneratedLezione } from "@/types/api/admin/lezione";
+import {
+  LezioneToGenerate as GeneratedLezione,
+  TipoLezione,
+} from "@/types/api/admin/lezione";
 
 type Props = {
   docenti: {
@@ -64,7 +67,14 @@ export default function AddLezioniModal({
               alunniIds: alunni.map((alunno) => Number(alunno)),
               orario: new Date(startDate),
               durataInMin: Number(e.currentTarget.durata.value),
-              solfeggio: Boolean(e.currentTarget.solfeggio.value),
+              tipoLezione: (String(e.currentTarget.radio_group.value) ===
+              "SOLFEGGIO"
+                ? TipoLezione.SOLFEGGIO
+                : String(e.currentTarget.radio_group.value) === "KOALA"
+                ? TipoLezione.KOALA
+                : String(e.currentTarget.radio_group.value) === "TIPPETE"
+                ? TipoLezione.TIPPETE
+                : TipoLezione.NORMALE) as TipoLezione,
             });
             startDate.setDate(startDate.getDate() + 7);
           } while (endDate.getTime() - startDate.getTime() >= 0);
@@ -100,7 +110,36 @@ export default function AddLezioniModal({
               </Form.Select>
             </Col>
             <Col xs="12">
-              <Form.Check type="checkbox" name="solfeggio" label="Solfeggio" />
+              <div className="mb-3">
+                <Form.Check
+                  inline
+                  label="Normale"
+                  name="radio_group"
+                  type="radio"
+                  value="NORMALE"
+                />
+                <Form.Check
+                  inline
+                  label="Solfeggio"
+                  name="radio_group"
+                  type="radio"
+                  value="SOLFEGGIO"
+                />
+                <Form.Check
+                  inline
+                  label="Tippete"
+                  name="radio_group"
+                  type="radio"
+                  value="TIPPETE"
+                />
+                <Form.Check
+                  inline
+                  label="Koala"
+                  name="radio_group"
+                  type="radio"
+                  value="KOALA"
+                />
+              </div>
             </Col>
             <Col xs="12">
               <Row className="g-1">

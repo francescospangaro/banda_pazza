@@ -4,6 +4,7 @@ import GenericTable from "@/components/GenericTable";
 import TextareaAutosize from "react-textarea-autosize";
 import { Form } from "react-bootstrap";
 import { Lezione, Libretto } from "@/types/api/lezioni";
+import { TipoLezione } from "@/types/api/admin/lezione"
 
 type Props = {
   content: Lezione[];
@@ -23,7 +24,7 @@ type TableLezione = {
   note?: string;
   recuperataDa?: { id: number; orarioDiInizio: Date; orarioDiFine: Date };
   recuperoDi?: { id: number; orarioDiInizio: Date; orarioDiFine: Date };
-  solfeggio: boolean;
+  tipoLezione: TipoLezione,
 };
 
 export default function LezioniTable({
@@ -61,7 +62,7 @@ export default function LezioniTable({
               : ""),
           recuperataDa: lezione.recuperataDa,
           recuperoDi: lezione.recuperoDi,
-          solfeggio: lezione.solfeggio,
+          tipoLezione: lezione.tipoLezione,
         };
       }),
     [content]

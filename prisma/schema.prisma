@@ -50,6 +50,7 @@ model Lezione {
     recuperoDi     Lezione?      @relation("LezioneDiRecupero", fields: [recuperoId], references: [id])
     recuperataDa   Lezione?      @relation("LezioneDiRecupero")
     tipoLezione    TipoLezione   @default(NORMALE)
+    paid           Boolean       @default(false)
 
     @@unique([docenteId, orarioDiInizio, orarioDiFine, tipoLezione])
 }

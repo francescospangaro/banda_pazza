@@ -5,23 +5,33 @@ import { Button } from "react-bootstrap";
 import { Docente } from "@/types/api/admin/docente";
 
 type Props = {
-  content: Docente[];
+  content: (Docente & { euros: number })[];
   onEdit?: (docente: Docente) => Promise<any>;
+  onPay?: (docente: Docente) => Promise<void>;
   scrollable?: boolean;
 };
 
 type TableDocente = Docente & {
+  euros: number;
   editable: boolean;
+  payable: boolean;
 };
 
-export default function DocentiTable({ content, onEdit, scrollable }: Props) {
+export default function DocentiTable({
+  content,
+  onEdit,
+  onPay,
+  scrollable,
+}: Props) {
   const [editingDocenti, setEditingDocenti] = useState(new Set<number>());
+  const [docentiBeingPaid, setDocentiBeingPaid] = useState(new Set<number>());
   const tableData: TableDocente[] = useMemo(
     () =>
       content.map((docente) => {
         return {
           ...docente,
           editable: true,
+          payable: true,
         };
       }),
     [content]
@@ -78,8 +88,53 @@ export default function DocentiTable({ content, onEdit, scrollable }: Props) {
           );
         },
       },
+      {
+        Header: "Da pagare",
+        accessor: "euros",
+        Cell: (props) => <>{props.value + "€"}</>,
+      },
+      {
+        Header: "",
+        accessor: "payable",
+        Cell: (props) => {
+          const docenteId = props.row.original.id;
+          return (
+            <Button
+              size="sm"
+              className="w-100"
+              disabled={docentiBeingPaid.has(docenteId)}
+              onClick={async () => {
+                if (!onPay) return;
+
+                setDocentiBeingPaid((docenti) => {
+                  const newDocenti = new Set(docenti);
+                  newDocenti.add(docenteId);
+                  return newDocenti;
+                });
+
+                await onPay(props.row.original);
+
+                setDocentiBeingPaid((docenti) => {
+                  const newDocenti = new Set(docenti);
+                  newDocenti.delete(docenteId);
+                  return newDocenti;
+                });
+              }}
+            >
+              Paga
+            </Button>
+          );
+        },
+      },
     ],
-    [onEdit, editingDocenti, setEditingDocenti]
+    [
+      onEdit,
+      editingDocenti,
+      setEditingDocenti,
+      onPay,
+      docentiBeingPaid,
+      setDocentiBeingPaid,
+    ]
   );
 
   return (

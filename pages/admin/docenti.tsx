@@ -10,12 +10,40 @@ import styles from "@/styles/Home.module.css";
 import { prisma } from "@/lib/database";
 import { zodFetch } from "@/lib/fetch";
 import * as DocenteApi from "@/types/api/admin/docente";
+import * as PaymentsApi from "@/types/api/admin/payments";
 
 type Props = {
-  docenti: Docente[];
+  docenti: (Docente & { euros: number })[];
 };
 
 export const getServerSideProps = requireAuth<Props>(async () => {
+  const docenteIdToMinutes: Map<number, number> = (
+    await prisma.$queryRaw<
+      {
+        docenteId: unknown;
+        minutes: unknown;
+      }[]
+    >`
+        SELECT docenteId                                                as docenteId,
+               SUM(TIMESTAMPDIFF(MINUTE, orarioDiInizio, orarioDiFine)) as minutes
+        FROM lezione
+        WHERE paid = false
+          AND (libretto = "PRESENTE" OR libretto = "ASSENTE_NON_GIUSTIFICATO")
+          AND orarioDiFine < CAST(${new Date().toJSON()} as DATETIME)
+        GROUP BY lezione.docenteId
+    `
+  )
+    .map((entry) => {
+      return {
+        docenteId: Number(entry.docenteId),
+        minutes: Number(entry.minutes ?? 0),
+      };
+    })
+    .reduce((map, entry) => {
+      map.set(entry.docenteId, entry.minutes);
+      return map;
+    }, new Map<number, number>());
+
   return {
     props: {
       docenti: (await prisma.docente.findMany({})).map((docente) => {
@@ -25,6 +53,7 @@ export const getServerSideProps = requireAuth<Props>(async () => {
           cognome: docente.cognome,
           email: docente.email,
           cf: docente.cf,
+          euros: ((docenteIdToMinutes.get(docente.id) ?? 0) / 60) * 10, // TODO: actually use the hourly rate
         };
       }),
     },
@@ -57,6 +86,27 @@ const Home: NextPage<Props> = (props) => {
                 setEditingDocente(docente);
                 setShowEditModal(true);
               }}
+              onPay={async (docente) => {
+                const { res } = await zodFetch("/api/admin/payments", {
+                  method: "POST",
+                  body: {
+                    value: { docenteId: docente.id },
+                    validator: PaymentsApi.Post.RequestValidator,
+                  },
+                  responseValidator: PaymentsApi.Post.ResponseValidator,
+                });
+
+                if (res.ok) {
+                  setDocenti((docenti) => {
+                    const newArr = [...docenti];
+                    newArr[newArr.findIndex((d) => d.id === docente.id)] = {
+                      ...docente,
+                      euros: 0,
+                    };
+                    return newArr;
+                  });
+                }
+              }}
             />
           </main>
         </Container>
@@ -77,7 +127,7 @@ const Home: NextPage<Props> = (props) => {
 
           if (res.ok) {
             const docente = await parser();
-            setDocenti((docenti) => [...docenti, docente]);
+            setDocenti((docenti) => [...docenti, { ...docente, euros: 0 }]);
             return { success: true, errMsg: "" };
           }
 
@@ -107,7 +157,14 @@ const Home: NextPage<Props> = (props) => {
             const docente = await parser();
             setDocenti((docenti) => {
               const newArr = [...docenti];
-              newArr[newArr.findIndex((d) => d.id === docente.id)] = docente;
+              const prevDocenteIdx = newArr.findIndex(
+                (d) => d.id === docente.id
+              );
+              const prevDocente = docenti[prevDocenteIdx];
+              newArr[prevDocenteIdx] = {
+                ...docente,
+                euros: prevDocente.euros,
+              };
               return newArr;
             });
             return { success: true, errMsg: "" };
