@@ -11,5 +11,3 @@ ALTER TABLE `Lezione` ADD COLUMN `tipoLezione` ENUM('NORMALE', 'SOLFEGGIO', 'TIP
 -- CreateIndex
 CREATE UNIQUE INDEX `Lezione_docenteId_orarioDiInizio_orarioDiFine_tipoLezione_key` ON `Lezione`(`docenteId`, `orarioDiInizio`, `orarioDiFine`, `tipoLezione`);
 
--- DropIndex
-DROP INDEX `Lezione_docenteId_orarioDiInizio_orarioDiFine_key` ON `lezione`;
