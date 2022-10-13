@@ -115,7 +115,7 @@ export default function LezioniTable({
             >
               <option value="">---</option>
               <option value="PRESENTE">Presente</option>
-              {!props.row.original.solfeggio && (
+              {(props.row.original.tipoLezione === "NORMALE") && (
                 <>
                   <option value="ASSENTE_GIUSTIFICATO">
                     Assente Giustificato
