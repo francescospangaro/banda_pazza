@@ -26,7 +26,7 @@ export const getServerSideProps = requireAuth<Props>(async () => {
     >`
         SELECT docenteId                                                as docenteId,
                SUM(TIMESTAMPDIFF(MINUTE, orarioDiInizio, orarioDiFine)) as minutes
-        FROM lezione
+        FROM Lezione
         WHERE paid = false
           AND (libretto = "PRESENTE" OR libretto = "ASSENTE_NON_GIUSTIFICATO")
           AND orarioDiFine < CAST(${new Date().toJSON()} as DATETIME)
