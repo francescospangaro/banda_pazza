@@ -6,6 +6,7 @@ export const DocenteToGenerateValidator = z.object({
   email: z.string().email(),
   cf: z.string(),
   password: z.string(),
+  stipendioOrario: z.number(),
 });
 export type DocenteToGenerate = z.infer<typeof DocenteToGenerateValidator>;
 
@@ -15,6 +16,7 @@ export const DocenteValidator = z.object({
   cognome: z.string(),
   email: z.string(),
   cf: z.string(),
+  stipendioOrario: z.number(),
 });
 export type Docente = z.infer<typeof DocenteValidator>;
 

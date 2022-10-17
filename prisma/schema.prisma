@@ -21,6 +21,7 @@ model Docente {
     admin           Boolean      @default(false)
     password        String
     lezioni         Lezione[]
+    stipendioOrario Int          @default(0)
 //    oreDiLavoro     Int        @default(0)
 //    oreRecuperare   Int        @default(0)
 }

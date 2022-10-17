@@ -5,28 +5,41 @@ import { Button } from "react-bootstrap";
 import { Docente } from "@/types/api/admin/docente";
 
 type Props = {
-    content: (Docente)[];
+    content: (Docente & { hoursDone: number } & { euros: number } & { eurosPaid: number })[];
     onEdit?: (docente: Docente) => Promise<any>;
+    onPay?: (docente: Docente) => Promise<void>;
     scrollable?: boolean;
 };
 
-type TableDocente = Docente & {
+type TablePagamenti = Docente & {
+    hoursDone: number;
+    euros: number;
     editable: boolean;
+    payable: boolean;
+    eurosPaid: number;
 };
 
-export default function DocentiTable({ content, onEdit, scrollable }: Props) {
-    const [editingDocenti, setEditingDocenti] = useState(new Set<number>());
-    const tableData: TableDocente[] = useMemo(() =>
-            content.map(docente => {
+export default function PagamentiTable({
+                                         content,
+                                         onEdit,
+                                         onPay,
+                                         scrollable,
+                                     }: Props) {
+    const [docentiBeingPaid, setDocentiBeingPaid] = useState(new Set<number>());
+    const tableData: TablePagamenti[] = useMemo(
+        () =>
+            content.map((docente) => {
                 return {
                     ...docente,
                     editable: true,
+                    payable: true,
                 };
             }),
         [content]
     );
 
-    const columns = useMemo<Column<TableDocente>[]>(
+
+    const columns = useMemo<Column<TablePagamenti>[]>(
         () => [
             {
                 Header: "Nome",
@@ -37,52 +50,64 @@ export default function DocentiTable({ content, onEdit, scrollable }: Props) {
                 accessor: "cognome",
             },
             {
-                Header: "Codice Fiscale",
-                accessor: "cf",
+                Header: "Ore fatte:",
+                accessor: "hoursDone",
+                Cell: (props) => <>{props.value}</>
             },
             {
-                Header: "Email",
-                accessor: "email",
+                Header: "Pagati:",
+                accessor: "eurosPaid",
+                Cell: (props) => <>{props.value + "€"}</>
+            },
+            {
+                Header: "Da pagare",
+                accessor: "euros",
+                Cell: (props) => <>{props.value + "€"}</>,
             },
             {
                 Header: "",
-                accessor: "editable",
+                accessor: "payable",
                 Cell: (props) => {
                     const docenteId = props.row.original.id;
                     return (
                         <Button
                             size="sm"
                             className="w-100"
-                            disabled={editingDocenti.has(docenteId)}
+                            disabled={docentiBeingPaid.has(docenteId)}
                             onClick={async () => {
-                                if (!onEdit) return;
+                                if (!onPay) return;
 
-                                setEditingDocenti((docenti) => {
+                                setDocentiBeingPaid((docenti) => {
                                     const newDocenti = new Set(docenti);
                                     newDocenti.add(docenteId);
                                     return newDocenti;
                                 });
 
-                                await onEdit(props.row.original);
+                                await onPay(props.row.original);
 
-                                setEditingDocenti((docenti) => {
+                                setDocentiBeingPaid((docenti) => {
                                     const newDocenti = new Set(docenti);
                                     newDocenti.delete(docenteId);
                                     return newDocenti;
                                 });
                             }}
                         >
-                            Edit
+                            Paga
                         </Button>
                     );
                 },
             },
         ],
-        [onEdit, editingDocenti, setEditingDocenti]
+        [
+            onEdit,
+            onPay,
+            docentiBeingPaid,
+            setDocentiBeingPaid,
+        ]
     );
 
     return (
-        <GenericTable<TableDocente>
+        <GenericTable<TablePagamenti>
             table={useTable(
                 {
                     columns,

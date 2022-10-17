@@ -21,6 +21,7 @@ const getDocenti = endpoint(
             cognome: docente.cognome,
             email: docente.email,
             cf: docente.cf,
+            stipendioOrario: docente.stipendioOrario,
           };
         }
       ),
@@ -42,6 +43,7 @@ const addDocente = endpoint(
         email: toGenerate.email,
         cf: toGenerate.cf,
         password: bcrypt.hashSync(toGenerate.password, 12),
+        stipendioOrario: toGenerate.stipendioOrario,
       },
     });
 

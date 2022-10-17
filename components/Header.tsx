@@ -43,6 +43,9 @@ export default function Header() {
                   <Link href="/admin/alunni" passHref>
                     <Nav.Link>Alunni</Nav.Link>
                   </Link>
+                    <Link href="/admin/pagamenti" passHref>
+                        <Nav.Link>Pagamenti</Nav.Link>
+                    </Link>
                 </>
               )}
             </Nav>
