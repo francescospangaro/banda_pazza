@@ -10,12 +10,27 @@ import styles from "@/styles/Home.module.css";
 import { prisma } from "@/lib/database";
 import { zodFetch } from "@/lib/fetch";
 import * as DocenteApi from "@/types/api/admin/docente";
-import * as PaymentsApi from "@/types/api/admin/payments";
 
 type Props = {
-  docenti: (Docente)[];
+  docenti: Docente[];
 };
 
+export const getServerSideProps = requireAuth<Props>(async () => {
+  return {
+    props: {
+      docenti: (await prisma.docente.findMany({})).map((docente) => {
+        return {
+          id: docente.id,
+          nome: docente.nome,
+          cognome: docente.cognome,
+          email: docente.email,
+          cf: docente.cf,
+          stipendioOrario: docente.stipendioOrario,
+        };
+      }),
+    },
+  };
+}, true);
 
 const Home: NextPage<Props> = (props) => {
   const [docenti, setDocenti] = useState(props.docenti);
@@ -63,7 +78,7 @@ const Home: NextPage<Props> = (props) => {
 
           if (res.ok) {
             const docente = await parser();
-            setDocenti((docenti) => [...docenti, { ...docente, hoursDone: 0, euros: 0, eurosPaid: 0}]);
+            setDocenti((docenti) => [...docenti, docente]);
             return { success: true, errMsg: "" };
           }
 
@@ -93,13 +108,7 @@ const Home: NextPage<Props> = (props) => {
             const docente = await parser();
             setDocenti((docenti) => {
               const newArr = [...docenti];
-              const prevDocenteIdx = newArr.findIndex(
-                (d) => d.id === docente.id
-              );
-              const prevDocente = docenti[prevDocenteIdx];
-              newArr[prevDocenteIdx] = {
-                ...docente,
-              };
+              newArr[newArr.findIndex((d) => d.id === docente.id)] = docente;
               return newArr;
             });
             return { success: true, errMsg: "" };
