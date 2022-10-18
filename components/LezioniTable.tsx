@@ -150,12 +150,12 @@ export default function LezioniTable({
 
   return (
     <GenericTable<TableLezione>
+      scrollable={scrollable}
       table={useTable(
         {
           columns,
           data: tableData,
           autoResetHiddenColumns: false,
-          scrollable: scrollable,
         },
         useSortBy
       )}

@@ -103,12 +103,12 @@ export default function AlunniTable({
 
   return (
     <GenericTable<TableAlunno>
+      scrollable={scrollable}
       table={useTable(
         {
           columns,
           data: tableData,
           autoResetHiddenColumns: false,
-          scrollable: scrollable,
         },
         useSortBy
       )}

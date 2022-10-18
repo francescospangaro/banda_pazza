@@ -102,12 +102,12 @@ export default function PagamentiTable({
 
   return (
     <GenericTable<TablePagamenti>
+      scrollable={scrollable}
       table={useTable(
         {
           columns,
           data: tableData,
           autoResetHiddenColumns: false,
-          scrollable: scrollable,
         },
         useSortBy
       )}

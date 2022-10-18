@@ -84,12 +84,12 @@ export default function DocentiTable({ content, onEdit, scrollable }: Props) {
 
   return (
     <GenericTable<TableDocente>
+      scrollable={scrollable}
       table={useTable(
         {
           columns,
           data: tableData,
           autoResetHiddenColumns: false,
-          scrollable: scrollable,
         },
         useSortBy
       )}
