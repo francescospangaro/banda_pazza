@@ -42,8 +42,8 @@ const addDocente = endpoint(
         cognome: toGenerate.cognome,
         email: toGenerate.email,
         cf: toGenerate.cf,
-        password: bcrypt.hashSync(toGenerate.password, 12),
         stipendioOrario: toGenerate.stipendioOrario,
+        password: bcrypt.hashSync(toGenerate.password, 12),
       },
     });
 
@@ -55,6 +55,7 @@ const addDocente = endpoint(
         cognome: docente.cognome,
         email: docente.email,
         cf: docente.cf,
+        stipendioOrario: docente.stipendioOrario,
       },
     };
   }
@@ -73,6 +74,7 @@ const editDocente = endpoint(
         cognome: toEdit.cognome ? toEdit.cognome : undefined,
         email: toEdit.email ? toEdit.email : undefined,
         cf: toEdit.cf ? toEdit.cf : undefined,
+        stipendioOrario: toEdit.stipendioOrario ? toEdit.stipendioOrario : undefined,
         password: toEdit.password
           ? bcrypt.hashSync(toEdit.password, 12)
           : undefined,
@@ -88,6 +90,7 @@ const editDocente = endpoint(
         cognome: docente.cognome,
         email: docente.email,
         cf: docente.cf,
+        stipendioOrario: docente.stipendioOrario,
       },
     };
   }
