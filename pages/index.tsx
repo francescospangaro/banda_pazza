@@ -125,14 +125,15 @@ const Home: NextPage<Props> = () => {
               <Col xs="12" md="auto">
                 <Form.Control
                   type="date"
-                  value={currentDate?.toLocaleDateString("en-CA", {
+                  defaultValue={currentDate?.toLocaleDateString("en-CA", {
                     year: "numeric",
                     month: "2-digit",
                     day: "2-digit",
                   })}
                   className="w-100"
-                  onChange={(e) => {
-                    setCurrentDate(new Date(e.currentTarget.value));
+                  onBlur={(e) => {
+                    if(e.currentTarget.value)
+                      setCurrentDate(new Date(e.currentTarget.value));
                   }}
                 />
               </Col>
