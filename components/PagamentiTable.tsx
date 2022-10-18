@@ -5,25 +5,24 @@ import { Button } from "react-bootstrap";
 import { Docente } from "@/types/api/admin/docente";
 
 type Props = {
-  content: (Docente & { hoursDone: number } & { euros: number } & {
+  content: (Docente & {
+    hoursToBePaid: number;
+    eurosToBePaid: number;
     eurosPaid: number;
   })[];
-  onEdit?: (docente: Docente) => Promise<any>;
   onPay?: (docente: Docente) => Promise<void>;
   scrollable?: boolean;
 };
 
 type TablePagamenti = Docente & {
-  hoursDone: number;
-  euros: number;
-  editable: boolean;
-  payable: boolean;
+  hoursToBePaid: number;
+  eurosToBePaid: number;
   eurosPaid: number;
+  payable: boolean;
 };
 
 export default function PagamentiTable({
   content,
-  onEdit,
   onPay,
   scrollable,
 }: Props) {
@@ -33,7 +32,6 @@ export default function PagamentiTable({
       content.map((docente) => {
         return {
           ...docente,
-          editable: true,
           payable: true,
         };
       }),
@@ -52,7 +50,7 @@ export default function PagamentiTable({
       },
       {
         Header: "Ore fatte:",
-        accessor: "hoursDone",
+        accessor: "hoursToBePaid",
         Cell: (props) => <>{props.value}</>,
       },
       {
@@ -62,7 +60,7 @@ export default function PagamentiTable({
       },
       {
         Header: "Da pagare",
-        accessor: "euros",
+        accessor: "eurosToBePaid",
         Cell: (props) => <>{props.value + "€"}</>,
       },
       {
@@ -99,7 +97,7 @@ export default function PagamentiTable({
         },
       },
     ],
-    [onEdit, onPay, docentiBeingPaid, setDocentiBeingPaid]
+    [onPay, docentiBeingPaid, setDocentiBeingPaid]
   );
 
   return (

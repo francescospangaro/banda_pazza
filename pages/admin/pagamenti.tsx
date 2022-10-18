@@ -2,7 +2,7 @@ import requireAuth from "@/lib/auth";
 import { NextPage } from "next";
 import React, { useState } from "react";
 import Layout from "@/components/Layout";
-import { Button, Col, Container, Row } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import { Docente } from "@/types/api/admin/docente";
 import PagamentiTable from "@/components/PagamentiTable";
 import styles from "@/styles/Home.module.css";
@@ -11,65 +11,52 @@ import { zodFetch } from "@/lib/fetch";
 import * as PaymentsApi from "@/types/api/admin/payments";
 
 type Props = {
-  docenti: (Docente & { hoursDone: number } & { euros: number } & {
+  docenti: (Docente & {
+    hoursToBePaid: number;
+    eurosToBePaid: number;
     eurosPaid: number;
   })[];
 };
 
 export const getServerSideProps = requireAuth<Props>(async () => {
-  const docenteIdToMinutes: Map<number, number> = (
+  const docenteIdToMinutes: Map<
+    number,
+    { paidMinutes: number; nonPaidMinutes: number }
+  > = (
     await prisma.$queryRaw<
       {
         docenteId: unknown;
         minutes: unknown;
+        paid: unknown;
       }[]
     >`
         SELECT docenteId                                                as docenteId,
-               SUM(TIMESTAMPDIFF(MINUTE, orarioDiInizio, orarioDiFine)) as minutes
+               SUM(TIMESTAMPDIFF(MINUTE, orarioDiInizio, orarioDiFine)) as minutes,
+               paid                                                     as paid
         FROM Lezione
-        WHERE paid = false
-          AND (libretto = "PRESENTE" OR libretto = "ASSENTE_NON_GIUSTIFICATO")
+        WHERE (libretto = 'PRESENTE' OR libretto = 'ASSENTE_NON_GIUSTIFICATO')
           AND orarioDiFine < CAST(${new Date().toJSON()} as DATETIME)
-        GROUP BY Lezione.docenteId
+        GROUP BY Lezione.docenteId, Lezione.paid
     `
   )
     .map((entry) => {
       return {
         docenteId: Number(entry.docenteId),
         minutes: Number(entry.minutes ?? 0),
+        paid: Boolean(entry.paid),
       };
     })
     .reduce((map, entry) => {
-      map.set(entry.docenteId, entry.minutes);
+      map.set(entry.docenteId, {
+        paidMinutes: entry.paid
+          ? entry.minutes
+          : map.get(entry.docenteId)?.paidMinutes ?? 0,
+        nonPaidMinutes: !entry.paid
+          ? entry.minutes
+          : map.get(entry.docenteId)?.nonPaidMinutes ?? 0,
+      });
       return map;
-    }, new Map<number, number>());
-
-  const paidLessons: Map<number, number> = (
-    await prisma.$queryRaw<
-      {
-        docenteId: unknown;
-        minutes: unknown;
-      }[]
-    >`
-        SELECT docenteId                                                as docenteId,
-               SUM(TIMESTAMPDIFF(MINUTE, orarioDiInizio, orarioDiFine)) as minutes
-        FROM Lezione
-        WHERE paid = true
-          AND (libretto = "PRESENTE" OR libretto = "ASSENTE_NON_GIUSTIFICATO")
-          AND orarioDiFine < CAST(${new Date().toJSON()} as DATETIME)
-        GROUP BY Lezione.docenteId
-    `
-  )
-    .map((entry) => {
-      return {
-        docenteId: Number(entry.docenteId),
-        minutes: Number(entry.minutes ?? 0),
-      };
-    })
-    .reduce((map, entry) => {
-      map.set(entry.docenteId, entry.minutes);
-      return map;
-    }, new Map<number, number>());
+    }, new Map<number, { paidMinutes: number; nonPaidMinutes: number }>());
 
   return {
     props: {
@@ -80,12 +67,15 @@ export const getServerSideProps = requireAuth<Props>(async () => {
           cognome: docente.cognome,
           email: docente.email,
           cf: docente.cf,
-          hoursDone: (docenteIdToMinutes.get(docente.id) ?? 0) / 60,
-          euros:
-            ((docenteIdToMinutes.get(docente.id) ?? 0) / 60) *
-            docente.stipendioOrario, // TODO: actually use the hourly rate
+          stipendioOrario: docente.stipendioOrario,
+          hoursToBePaid:
+            (docenteIdToMinutes.get(docente.id)?.nonPaidMinutes ?? 0) / 60,
+          eurosToBePaid:
+            ((docenteIdToMinutes.get(docente.id)?.nonPaidMinutes ?? 0) / 60) *
+            docente.stipendioOrario,
           eurosPaid:
-            ((paidLessons.get(docente.id) ?? 0) / 60) * docente.stipendioOrario, // TODO: actually use the hourly rate
+            ((docenteIdToMinutes.get(docente.id)?.paidMinutes ?? 0) / 60) *
+            docente.stipendioOrario,
         };
       }),
     },
@@ -116,11 +106,16 @@ const Home: NextPage<Props> = (props) => {
                 if (res.ok) {
                   setDocenti((docenti) => {
                     const newArr = [...docenti];
-                    newArr[newArr.findIndex((d) => d.id === docente.id)] = {
+                    const prevDocenteIdx = newArr.findIndex(
+                      (d) => d.id === docente.id
+                    );
+                    const prevDocente = newArr[prevDocenteIdx];
+                    newArr[prevDocenteIdx] = {
                       ...docente,
-                      hoursDone: 0,
-                      euros: 0,
-                      eurosPaid: 0,
+                      hoursToBePaid: 0,
+                      eurosToBePaid: 0,
+                      eurosPaid:
+                        prevDocente.eurosPaid + prevDocente.eurosToBePaid,
                     };
                     return newArr;
                   });
