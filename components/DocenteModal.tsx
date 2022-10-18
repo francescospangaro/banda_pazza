@@ -68,6 +68,7 @@ export default function DocenteModal<T extends Props<any>>(props: T) {
             cognome: e.currentTarget.cognome.value,
             email: e.currentTarget.email.value,
             cf: e.currentTarget.cf.value,
+            stipendioOrario: Number(e.currentTarget.stipendioOrario.value),
             password,
           };
 
@@ -79,6 +80,8 @@ export default function DocenteModal<T extends Props<any>>(props: T) {
               newDocente.email = undefined;
             if (newDocente.cf === docente?.cf) newDocente.cf = undefined;
             if (!newDocente.password) newDocente.password = undefined;
+            if (newDocente.stipendioOrario === docente?.stipendioOrario)
+              newDocente.stipendioOrario = undefined;
           }
 
           setExecuting(true);
@@ -116,6 +119,18 @@ export default function DocenteModal<T extends Props<any>>(props: T) {
                 name="cf"
                 defaultValue={docente?.cf}
               />
+            </Col>
+            <Col xs="12">
+              <Form.Label>Stipendio orario</Form.Label>
+              <InputGroup>
+                <Form.Control
+                  type="number"
+                  required
+                  name="stipendioOrario"
+                  defaultValue={docente?.stipendioOrario}
+                />
+                <InputGroup.Text>€/h</InputGroup.Text>
+              </InputGroup>
             </Col>
             <Col xs="12">
               <Form.Label>Email</Form.Label>
