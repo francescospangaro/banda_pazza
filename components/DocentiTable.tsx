@@ -42,6 +42,10 @@ export default function DocentiTable({ content, onEdit, scrollable }: Props) {
         accessor: "cf",
       },
       {
+        Header: "Stipendio",
+        accessor: "stipendioOrario",
+      },
+      {
         Header: "Email",
         accessor: "email",
       },
