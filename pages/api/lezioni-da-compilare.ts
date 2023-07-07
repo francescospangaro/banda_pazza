@@ -3,7 +3,6 @@ import { withIronSessionApiRoute } from "iron-session/next";
 import { sessionOptions } from "@/lib/session";
 import { prisma } from "@/lib/database";
 import { Get } from "@/types/api/lezioni-da-compilare";
-import { TipoLezione } from "@/types/api/admin/lezione";
 
 const getLezioniDaCompilare = endpoint(
   {

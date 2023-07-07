@@ -10,7 +10,6 @@ import { prisma } from "@/lib/database";
 import { zodFetch } from "@/lib/fetch";
 import * as PaymentsApi from "@/types/api/admin/payments";
 import Form from "react-bootstrap/Form";
-import Docenti from "@/pages/admin/docenti";
 
 type Props = {
   docenti: (Docente & {
@@ -284,11 +283,11 @@ const Home: NextPage<Props> = (props) => {
                     newArr[prevDocenteIdx] = {
                       ...prevDocente,
                       hoursToBePaidFirst:
-                        trimestre === 1 ? 0 : prevDocente.hoursToBePaidFirst,
+                      /*  trimestre === 1 ? 0 : */ prevDocente.hoursToBePaidFirst,
                       hoursToBePaidSecond:
-                        trimestre === 2 ? 0 : prevDocente.hoursToBePaidSecond,
+                      /*  trimestre === 2 ? 0 : */ prevDocente.hoursToBePaidSecond,
                       hoursToBePaidThird:
-                        trimestre === 3 ? 0 : prevDocente.hoursToBePaidThird,
+                      /*  trimestre === 3 ? 0 : */ prevDocente.hoursToBePaidThird,
                       eurosToBePaidFirst:
                         trimestre === 1 ? 0 : prevDocente.hoursToBePaidFirst,
                       eurosToBePaidSecond:
