@@ -12,13 +12,17 @@ const payLessons = endpoint(
     responseSchema: Post.ResponseValidator,
   },
   async ({ body }) => {
+    const inizio: Date = body.dataInizio;
+    const temp: Date = new Date(body.dataFine);
+    const now = new Date();
+    const fine: Date = Math.min(now.getMilliseconds(), temp.getMilliseconds()) === now.getMilliseconds() ? now : body.dataFine;
     await prisma.lezione.updateMany({
       where: {
         docenteId: body.docenteId,
         libretto: {
           in: [Libretto.PRESENTE, Libretto.ASSENTE_NON_GIUSTIFICATO],
         },
-        orarioDiFine: { lte: new Date() },
+        orarioDiFine: { gte: inizio , lte: fine },
       },
       data: { paid: true },
     });

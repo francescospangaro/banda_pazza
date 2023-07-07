@@ -8,7 +8,6 @@ type Props = {
   content: (Docente & {
     hoursToBePaid: number;
     eurosToBePaid: number;
-    eurosPaid: number;
   })[];
   onPay?: (docente: Docente) => Promise<void>;
   scrollable?: boolean;
@@ -17,7 +16,6 @@ type Props = {
 type TablePagamenti = Docente & {
   hoursToBePaid: number;
   eurosToBePaid: number;
-  eurosPaid: number;
   payable: boolean;
 };
 
@@ -49,17 +47,12 @@ export default function PagamentiTable({
         accessor: "cognome",
       },
       {
-        Header: "Ore fatte:",
+        Header: "Ore:",
         accessor: "hoursToBePaid",
         Cell: (props) => <>{props.value}</>,
       },
       {
-        Header: "Pagati:",
-        accessor: "eurosPaid",
-        Cell: (props) => <>{props.value + "€"}</>,
-      },
-      {
-        Header: "Da pagare",
+        Header: "Da pagare:",
         accessor: "eurosToBePaid",
         Cell: (props) => <>{props.value + "€"}</>,
       },
