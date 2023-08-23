@@ -32,7 +32,7 @@ export default function Header() {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="navbar-nav">
             <Nav className="me-auto">
-              {user?.admin && (
+              {user?.admin ? (
                 <>
                   <Link href="/admin/" passHref>
                     <Nav.Link>Lezioni</Nav.Link>
@@ -46,6 +46,15 @@ export default function Header() {
                     <Link href="/admin/pagamenti" passHref>
                         <Nav.Link>Pagamenti</Nav.Link>
                     </Link>
+                </>
+              ) : (
+                <>
+                  <Link href="/" passHref>
+                    <Nav.Link>Lezioni</Nav.Link>
+                  </Link>
+                  <Link href="/alunni" passHref>
+                    <Nav.Link>Report Alunni</Nav.Link>
+                  </Link>
                 </>
               )}
             </Nav>
