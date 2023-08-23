@@ -18,16 +18,18 @@ type Props = {
 export const getServerSideProps = requireAuth<Props>(async () => {
   return {
     props: {
-      docenti: (await prisma.docente.findMany({})).map((docente) => {
-        return {
-          id: docente.id,
-          nome: docente.nome,
-          cognome: docente.cognome,
-          email: docente.email,
-          cf: docente.cf,
-          stipendioOrario: docente.stipendioOrario,
-        };
-      }),
+      docenti: (await prisma.docente.findMany({ where: { admin: false } })).map(
+        (docente) => {
+          return {
+            id: docente.id,
+            nome: docente.nome,
+            cognome: docente.cognome,
+            email: docente.email,
+            cf: docente.cf,
+            stipendioOrario: docente.stipendioOrario,
+          };
+        }
+      ),
     },
   };
 }, true);

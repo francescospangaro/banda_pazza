@@ -282,6 +282,7 @@ const Home: NextPage<Props> = (props) => {
                     const prevDocente = newArr[prevDocenteIdx];
                     newArr[prevDocenteIdx] = {
                       ...prevDocente,
+                      //uncomment to have the hours reset on pay
                       hoursToBePaidFirst:
                       /*  trimestre === 1 ? 0 : */ prevDocente.hoursToBePaidFirst,
                       hoursToBePaidSecond:
