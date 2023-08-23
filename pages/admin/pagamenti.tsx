@@ -25,15 +25,18 @@ type Props = {
 let january: Date;
 let may: Date;
 let september: Date;
+let nextSeptember: Date;
 
-if (new Date().getMonth() < 9) {
+if (new Date().getMonth() < 8) {
   january = new Date(new Date().getFullYear(), 0, 1);
   may = new Date(new Date().getFullYear(), 4, 1);
   september = new Date(new Date().getFullYear() - 1, 8, 1);
+  nextSeptember = new Date(new Date().getFullYear(), 8, 1);
 } else {
   january = new Date(new Date().getFullYear() + 1, 0, 1);
   may = new Date(new Date().getFullYear() + 1, 4, 1);
   september = new Date(new Date().getFullYear(), 8, 1);
+  nextSeptember = new Date(new Date().getFullYear() + 1, 8, 1);
 }
 
 export const getServerSideProps = requireAuth<Props>(async () => {
@@ -134,7 +137,7 @@ export const getServerSideProps = requireAuth<Props>(async () => {
         FROM Lezione
         WHERE (libretto = 'PRESENTE' OR libretto = 'ASSENTE_NON_GIUSTIFICATO')
           AND orarioDiFine < CAST(${new Date().toJSON()} as DATETIME)
-          AND orarioDiFine BETWEEN (CAST(${may.toJSON()} as DATETIME)) AND (CAST(${september.toJSON()} as DATETIME))
+          AND orarioDiFine BETWEEN (CAST(${may.toJSON()} as DATETIME)) AND (CAST(${nextSeptember.toJSON()} as DATETIME))
         GROUP BY Lezione.docenteId, Lezione.paid
     `
   )
