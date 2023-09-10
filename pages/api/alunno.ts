@@ -50,6 +50,7 @@ const getAlunno = endpoint(
         docenteId: req.session.user!.id,
         alunni: { some: { id: req.body.id } },
         recuperoDi: null,
+        orarioDiFine: { gte: startYear, lte: endYear },
       },
       include: { recuperataDa: true }
     });
