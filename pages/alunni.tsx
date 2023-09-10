@@ -114,7 +114,20 @@ const Home: NextPage<Props> = (props) => {
           </Dropdown.Menu>
         </Dropdown>
 
-        <TimetablesTable content={alunnoData ? [alunnoData] : []} />
+        <TimetablesTable
+          content={
+            alunnoData
+              ? [alunnoData]
+              : [
+                {
+                  oreTotali: 0,
+                  oreFatte: 0,
+                  oreMancanti: 0,
+                  lezioni: [],
+                },
+              ]
+          }
+        />
         <AlunnoForDocentiTable scrollable content={alunnoData?.lezioni ?? []} />
       </Container>
     </Layout>
