@@ -149,15 +149,25 @@ const Home: NextPage<Props> = (props) => {
                 setTrimestre(trimestre);
               }}
             >
-              <option value="1" selected={trimestre == 1}>
-                Primo Trimestre
-              </option>
-              <option value="2" selected={trimestre == 2}>
-                Secondo Trimestre
-              </option>
-              <option value="3" selected={trimestre == 3}>
-                Terzo Trimestre
-              </option>
+              {semesters.map(({ start, end }, index) => (
+                <option
+                  key={index}
+                  value={index + 1}
+                  selected={trimestre === index + 1}
+                >
+                  {["Primo", "Secondo", "Terzo"][index]} Trimestre (
+                  {start.toLocaleDateString(undefined, {
+                    month: "long",
+                    year: "numeric",
+                  })}{" "}
+                  -{" "}
+                  {end.toLocaleDateString(undefined, {
+                    month: "long",
+                    year: "numeric",
+                  })}
+                  )
+                </option>
+              ))}
             </Form.Select>
             <PagamentiTable
               scrollable
