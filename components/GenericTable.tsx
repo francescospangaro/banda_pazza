@@ -125,14 +125,14 @@ export default function GenericTable<T extends object = {}>({
   if (!scrollable) return table;
 
   return (
-    <Row
+    <div
       className={
-        "align-items-start flex-grow-1 flex-shrink-1" +
+        "d-flex align-items-start flex-grow-1 flex-shrink-1" +
         (isDesktop ? " overflow-auto" : "")
       }
       style={{ width: "100%", minWidth: "fit-content" }}
     >
       {table}
-    </Row>
+    </div>
   );
 }
