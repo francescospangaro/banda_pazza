@@ -37,7 +37,7 @@ const getAlunno = endpoint(
         FROM Lezione join _alunnotolezione on (Lezione.id = _alunnotolezione.B)
         WHERE docenteId = ${req.session.user!.id}
         AND A = ${req.body.id}
-        AND (libretto = "PRESENTE" OR libretto = "ASSENTE_NON_GIUSTIFICATO")
+        AND (libretto = 'PRESENTE' OR libretto = 'ASSENTE_NON_GIUSTIFICATO')
     `
     )[0]?.minutes ?? 0);
 
