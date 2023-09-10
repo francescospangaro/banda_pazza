@@ -26,3 +26,12 @@ export function getSemestersFor(now: Date): { start: Date; end: Date }[] {
     { start: may, end: nextSeptember },
   ];
 }
+
+export function getCurrentScholasticYear() {
+  return getScholasticYear(new Date());
+}
+
+export function getScholasticYear(now: Date): [Date, Date] {
+  const semester = getSemestersFor(now);
+  return [semester[0].start, semester[semester.length - 1].end];
+}

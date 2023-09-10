@@ -3,6 +3,7 @@ import { withIronSessionApiRoute } from "iron-session/next";
 import { sessionOptions } from "@/lib/session";
 import { prisma } from "@/lib/database";
 import { Post } from "@/types/api/alunno";
+import { getCurrentScholasticYear } from "@/lib/semesters";
 
 const getAlunno = endpoint(
   {
@@ -13,6 +14,7 @@ const getAlunno = endpoint(
 
   async ({ req }) => {
 
+    const [startYear, endYear] = getCurrentScholasticYear()
     const totLessonMinutes: number = Number((
       await prisma.$queryRaw<
         {
@@ -22,8 +24,9 @@ const getAlunno = endpoint(
         SELECT SUM(TIMESTAMPDIFF(MINUTE, orarioDiInizio, orarioDiFine)) as minutes
         FROM Lezione join _alunnotolezione on (Lezione.id = _alunnotolezione.B)
         WHERE docenteId = ${req.session.user!.id}
-        AND A = ${req.body.id}
-        AND recuperoId IS NULL
+          AND A = ${req.body.id}
+          AND recuperoId IS NULL
+          AND orarioDiFine BETWEEN (CAST(${startYear.toJSON()} as DATETIME)) AND (CAST(${endYear.toJSON()} as DATETIME))
     `
     )[0]?.minutes ?? 0);
 
@@ -36,8 +39,9 @@ const getAlunno = endpoint(
         SELECT SUM(TIMESTAMPDIFF(MINUTE, orarioDiInizio, orarioDiFine)) as minutes
         FROM Lezione join _alunnotolezione on (Lezione.id = _alunnotolezione.B)
         WHERE docenteId = ${req.session.user!.id}
-        AND A = ${req.body.id}
-        AND (libretto = 'PRESENTE' OR libretto = 'ASSENTE_NON_GIUSTIFICATO')
+          AND A = ${req.body.id}
+          AND (libretto = 'PRESENTE' OR libretto = 'ASSENTE_NON_GIUSTIFICATO')
+          AND orarioDiFine BETWEEN (CAST(${startYear.toJSON()} as DATETIME)) AND (CAST(${endYear.toJSON()} as DATETIME))
     `
     )[0]?.minutes ?? 0);
 
