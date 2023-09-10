@@ -8,7 +8,7 @@ export function getSemestersFor(now: Date): { start: Date; end: Date }[] {
   let september: Date;
   let nextSeptember: Date;
 
-  if (now.getMonth() < 8) {
+  if (now.getMonth() <= 8) {
     january = new Date(now.getFullYear(), 0, 1);
     may = new Date(now.getFullYear(), 4, 1);
     september = new Date(now.getFullYear() - 1, 8, 1);
