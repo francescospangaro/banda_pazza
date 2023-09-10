@@ -10,6 +10,7 @@ import { prisma } from "@/lib/database";
 import { zodFetch } from "@/lib/fetch";
 import * as PaymentsApi from "@/types/api/admin/payments";
 import Form from "react-bootstrap/Form";
+import { getCurrentSemesters } from "@/lib/semesters";
 
 type Props = {
   docenti: (Docente & {
@@ -22,143 +23,53 @@ type Props = {
   })[];
 };
 
-let january: Date;
-let may: Date;
-let september: Date;
-let nextSeptember: Date;
-
-if (new Date().getMonth() < 8) {
-  january = new Date(new Date().getFullYear(), 0, 1);
-  may = new Date(new Date().getFullYear(), 4, 1);
-  september = new Date(new Date().getFullYear() - 1, 8, 1);
-  nextSeptember = new Date(new Date().getFullYear(), 8, 1);
-} else {
-  january = new Date(new Date().getFullYear() + 1, 0, 1);
-  may = new Date(new Date().getFullYear() + 1, 4, 1);
-  september = new Date(new Date().getFullYear(), 8, 1);
-  nextSeptember = new Date(new Date().getFullYear() + 1, 8, 1);
-}
+const semesters = getCurrentSemesters();
 
 export const getServerSideProps = requireAuth<Props>(async () => {
-  const docenteIdToMinutesFirst: Map<
+  const docenteIdToMinutes: Map<
     number,
     { paidMinutes: number; nonPaidMinutes: number }
-  > = (
-    await prisma.$queryRaw<
-      {
-        docenteId: unknown;
-        minutes: unknown;
-        paid: unknown;
-      }[]
-    >`
-        SELECT docenteId                                                as docenteId,
-               SUM(TIMESTAMPDIFF(MINUTE, orarioDiInizio, orarioDiFine)) as minutes,
-               paid                                                     as paid
-        FROM Lezione
-        WHERE (libretto = 'PRESENTE' OR libretto = 'ASSENTE_NON_GIUSTIFICATO')
-          AND orarioDiFine < CAST(${new Date().toJSON()} as DATETIME)
-          AND orarioDiFine BETWEEN (CAST(${september.toJSON()} as DATETIME)) AND (CAST(${january.toJSON()} as DATETIME))
-        GROUP BY Lezione.docenteId, Lezione.paid
-    `
-  )
-    .map((entry) => {
-      return {
-        docenteId: Number(entry.docenteId),
-        minutes: Number(entry.minutes ?? 0),
-        paid: Boolean(entry.paid),
-      };
+  >[] = await Promise.all(
+    semesters.map(async ({ start, end }) => {
+      return (
+        await prisma.$queryRaw<
+          {
+            docenteId: unknown;
+            minutes: unknown;
+            paid: unknown;
+          }[]
+        >`
+          SELECT docenteId                        as docenteId,
+                 SUM(TIMESTAMPDIFF(MINUTE, orarioDiInizio,
+                                   orarioDiFine)) as minutes,
+                 paid                             as paid
+          FROM Lezione
+          WHERE (libretto = 'PRESENTE' OR libretto = 'ASSENTE_NON_GIUSTIFICATO')
+            AND orarioDiFine < CAST(${new Date().toJSON()} as DATETIME)
+            AND orarioDiFine BETWEEN (CAST(${start.toJSON()} as DATETIME)) AND (CAST(${end.toJSON()} as DATETIME))
+          GROUP BY Lezione.docenteId, Lezione.paid
+        `
+      )
+        .map((entry) => {
+          return {
+            docenteId: Number(entry.docenteId),
+            minutes: Number(entry.minutes ?? 0),
+            paid: Boolean(entry.paid),
+          };
+        })
+        .reduce((map, entry) => {
+          map.set(entry.docenteId, {
+            paidMinutes: entry.paid
+              ? entry.minutes
+              : map.get(entry.docenteId)?.paidMinutes ?? 0,
+            nonPaidMinutes: !entry.paid
+              ? entry.minutes
+              : map.get(entry.docenteId)?.nonPaidMinutes ?? 0,
+          });
+          return map;
+        }, new Map<number, { paidMinutes: number; nonPaidMinutes: number }>());
     })
-    .reduce((map, entry) => {
-      map.set(entry.docenteId, {
-        paidMinutes: entry.paid
-          ? entry.minutes
-          : map.get(entry.docenteId)?.paidMinutes ?? 0,
-        nonPaidMinutes: !entry.paid
-          ? entry.minutes
-          : map.get(entry.docenteId)?.nonPaidMinutes ?? 0,
-      });
-      return map;
-    }, new Map<number, { paidMinutes: number; nonPaidMinutes: number }>());
-
-  const docenteIdToMinutesSecond: Map<
-    number,
-    { paidMinutes: number; nonPaidMinutes: number }
-  > = (
-    await prisma.$queryRaw<
-      {
-        docenteId: unknown;
-        minutes: unknown;
-        paid: unknown;
-      }[]
-    >`
-        SELECT docenteId                                                as docenteId,
-               SUM(TIMESTAMPDIFF(MINUTE, orarioDiInizio, orarioDiFine)) as minutes,
-               paid                                                     as paid
-        FROM Lezione
-        WHERE (libretto = 'PRESENTE' OR libretto = 'ASSENTE_NON_GIUSTIFICATO')
-          AND orarioDiFine < CAST(${new Date().toJSON()} as DATETIME)
-          AND orarioDiFine BETWEEN (CAST(${january.toJSON()} as DATETIME)) AND (CAST(${may.toJSON()} as DATETIME))
-        GROUP BY Lezione.docenteId, Lezione.paid
-    `
-  )
-    .map((entry) => {
-      return {
-        docenteId: Number(entry.docenteId),
-        minutes: Number(entry.minutes ?? 0),
-        paid: Boolean(entry.paid),
-      };
-    })
-    .reduce((map, entry) => {
-      map.set(entry.docenteId, {
-        paidMinutes: entry.paid
-          ? entry.minutes
-          : map.get(entry.docenteId)?.paidMinutes ?? 0,
-        nonPaidMinutes: !entry.paid
-          ? entry.minutes
-          : map.get(entry.docenteId)?.nonPaidMinutes ?? 0,
-      });
-      return map;
-    }, new Map<number, { paidMinutes: number; nonPaidMinutes: number }>());
-
-  const docenteIdToMinutesThird: Map<
-    number,
-    { paidMinutes: number; nonPaidMinutes: number }
-  > = (
-    await prisma.$queryRaw<
-      {
-        docenteId: unknown;
-        minutes: unknown;
-        paid: unknown;
-      }[]
-    >`
-        SELECT docenteId                                                as docenteId,
-               SUM(TIMESTAMPDIFF(MINUTE, orarioDiInizio, orarioDiFine)) as minutes,
-               paid                                                     as paid
-        FROM Lezione
-        WHERE (libretto = 'PRESENTE' OR libretto = 'ASSENTE_NON_GIUSTIFICATO')
-          AND orarioDiFine < CAST(${new Date().toJSON()} as DATETIME)
-          AND orarioDiFine BETWEEN (CAST(${may.toJSON()} as DATETIME)) AND (CAST(${nextSeptember.toJSON()} as DATETIME))
-        GROUP BY Lezione.docenteId, Lezione.paid
-    `
-  )
-    .map((entry) => {
-      return {
-        docenteId: Number(entry.docenteId),
-        minutes: Number(entry.minutes ?? 0),
-        paid: Boolean(entry.paid),
-      };
-    })
-    .reduce((map, entry) => {
-      map.set(entry.docenteId, {
-        paidMinutes: entry.paid
-          ? entry.minutes
-          : map.get(entry.docenteId)?.paidMinutes ?? 0,
-        nonPaidMinutes: !entry.paid
-          ? entry.minutes
-          : map.get(entry.docenteId)?.nonPaidMinutes ?? 0,
-      });
-      return map;
-    }, new Map<number, { paidMinutes: number; nonPaidMinutes: number }>());
+  );
 
   return {
     props: {
@@ -172,23 +83,22 @@ export const getServerSideProps = requireAuth<Props>(async () => {
           stipendioOrario: docente.stipendioOrario,
           //hours
           hoursToBePaidFirst:
-            (docenteIdToMinutesFirst.get(docente.id)?.nonPaidMinutes ?? 0) / 60,
+            (docenteIdToMinutes[0].get(docente.id)?.nonPaidMinutes ?? 0) / 60,
           hoursToBePaidSecond:
-            (docenteIdToMinutesSecond.get(docente.id)?.nonPaidMinutes ?? 0) /
-            60,
+            (docenteIdToMinutes[1].get(docente.id)?.nonPaidMinutes ?? 0) / 60,
           hoursToBePaidThird:
-            (docenteIdToMinutesThird.get(docente.id)?.nonPaidMinutes ?? 0) / 60,
+            (docenteIdToMinutes[2].get(docente.id)?.nonPaidMinutes ?? 0) / 60,
           //euros to pay
           eurosToBePaidFirst:
-            ((docenteIdToMinutesFirst.get(docente.id)?.nonPaidMinutes ?? 0) /
+            ((docenteIdToMinutes[0].get(docente.id)?.nonPaidMinutes ?? 0) /
               60) *
             docente.stipendioOrario,
           eurosToBePaidSecond:
-            ((docenteIdToMinutesSecond.get(docente.id)?.nonPaidMinutes ?? 0) /
+            ((docenteIdToMinutes[1].get(docente.id)?.nonPaidMinutes ?? 0) /
               60) *
             docente.stipendioOrario,
           eurosToBePaidThird:
-            ((docenteIdToMinutesThird.get(docente.id)?.nonPaidMinutes ?? 0) /
+            ((docenteIdToMinutes[2].get(docente.id)?.nonPaidMinutes ?? 0) /
               60) *
             docente.stipendioOrario,
         };
@@ -239,15 +149,25 @@ const Home: NextPage<Props> = (props) => {
                 setTrimestre(trimestre);
               }}
             >
-              <option value="1" selected={trimestre == 1}>
-                Primo Trimestre
-              </option>
-              <option value="2" selected={trimestre == 2}>
-                Secondo Trimestre
-              </option>
-              <option value="3" selected={trimestre == 3}>
-                Terzo Trimestre
-              </option>
+              {semesters.map(({ start, end }, index) => (
+                <option
+                  key={index}
+                  value={index + 1}
+                  selected={trimestre === index + 1}
+                >
+                  {["Primo", "Secondo", "Terzo"][index]} Trimestre (
+                  {start.toLocaleDateString(undefined, {
+                    month: "long",
+                    year: "numeric",
+                  })}{" "}
+                  -{" "}
+                  {end.toLocaleDateString(undefined, {
+                    month: "long",
+                    year: "numeric",
+                  })}
+                  )
+                </option>
+              ))}
             </Form.Select>
             <PagamentiTable
               scrollable
@@ -258,18 +178,8 @@ const Home: NextPage<Props> = (props) => {
                   body: {
                     value: {
                       docenteId: docente.id,
-                      dataInizio:
-                        trimestre === 1
-                          ? september
-                          : trimestre === 2
-                          ? january
-                          : may,
-                      dataFine:
-                        trimestre === 1
-                          ? january
-                          : trimestre === 2
-                          ? may
-                          : september,
+                      dataInizio: semesters[trimestre - 1].start,
+                      dataFine: semesters[trimestre - 1].end,
                     },
                     validator: PaymentsApi.Post.RequestValidator,
                   },
@@ -287,11 +197,11 @@ const Home: NextPage<Props> = (props) => {
                       ...prevDocente,
                       //uncomment to have the hours reset on pay
                       hoursToBePaidFirst:
-                      /*  trimestre === 1 ? 0 : */ prevDocente.hoursToBePaidFirst,
+                        /*  trimestre === 1 ? 0 : */ prevDocente.hoursToBePaidFirst,
                       hoursToBePaidSecond:
-                      /*  trimestre === 2 ? 0 : */ prevDocente.hoursToBePaidSecond,
+                        /*  trimestre === 2 ? 0 : */ prevDocente.hoursToBePaidSecond,
                       hoursToBePaidThird:
-                      /*  trimestre === 3 ? 0 : */ prevDocente.hoursToBePaidThird,
+                        /*  trimestre === 3 ? 0 : */ prevDocente.hoursToBePaidThird,
                       eurosToBePaidFirst:
                         trimestre === 1 ? 0 : prevDocente.hoursToBePaidFirst,
                       eurosToBePaidSecond:

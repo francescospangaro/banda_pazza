@@ -102,7 +102,7 @@ const Home: NextPage<Props> = (props) => {
       <Container fluid className={styles.container}>
         <Dropdown onSelect={(alunnoId) => {setSelectedAlunno(alunnoId ? Number(alunnoId) : null)}}>
           <Dropdown.Toggle id="dropdown-custom-components">
-            Seleziona Alunno
+            {alunno ? props.alunni.find(a => a.id === alunno)?.fullName : "Seleziona Alunno"}
           </Dropdown.Toggle>
 
           <Dropdown.Menu as={CustomMenu}>
@@ -114,7 +114,20 @@ const Home: NextPage<Props> = (props) => {
           </Dropdown.Menu>
         </Dropdown>
 
-        <TimetablesTable content={alunnoData ? [alunnoData] : []} />
+        <TimetablesTable
+          content={
+            alunnoData
+              ? [alunnoData]
+              : [
+                {
+                  oreTotali: 0,
+                  oreFatte: 0,
+                  oreMancanti: 0,
+                  lezioni: [],
+                },
+              ]
+          }
+        />
         <AlunnoForDocentiTable scrollable content={alunnoData?.lezioni ?? []} />
       </Container>
     </Layout>
