@@ -39,15 +39,15 @@ export const getServerSideProps = requireAuth<Props>(async () => {
             paid: unknown;
           }[]
         >`
-          SELECT docenteId                        as docenteId,
-                 SUM(TIMESTAMPDIFF(MINUTE, orarioDiInizio,
-                                   orarioDiFine)) as minutes,
+          SELECT "docenteId"                        as "docenteId",
+                 SUM(TIMESTAMPDIFF(MINUTE, "orarioDiInizio",
+                                   "orarioDiFine")) as minutes,
                  paid                             as paid
-          FROM Lezione
-          WHERE (libretto = 'PRESENTE' OR libretto = 'ASSENTE_NON_GIUSTIFICATO')
-            AND orarioDiFine < CAST(${new Date().toJSON()} as DATETIME)
-            AND orarioDiFine BETWEEN (CAST(${start.toJSON()} as DATETIME)) AND (CAST(${end.toJSON()} as DATETIME))
-          GROUP BY Lezione.docenteId, Lezione.paid
+          FROM "Lezione"
+          WHERE ("libretto" = 'PRESENTE' OR "libretto" = 'ASSENTE_NON_GIUSTIFICATO')
+            AND "orarioDiFine" < CAST(${new Date().toJSON()} as DATETIME)
+            AND "orarioDiFine" BETWEEN (CAST(${start.toJSON()} as DATETIME)) AND (CAST(${end.toJSON()} as DATETIME))
+          GROUP BY "Lezione"."docenteId", "Lezione"."paid"
         `
       )
         .map((entry) => {
