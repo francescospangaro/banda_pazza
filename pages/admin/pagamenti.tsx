@@ -40,13 +40,13 @@ export const getServerSideProps = requireAuth<Props>(async () => {
           }[]
         >`
           SELECT "docenteId"                        as "docenteId",
-                 SUM(EXTRACT(EPOCH FROM "orarioDiFine"-"orarioDiInizio")) as minutes,
-                 "paid"                             as paid
+                 SUM(EXTRACT(EPOCH FROM "orarioDiFine"-"orarioDiInizio")/60) as "minutes",
+                 "paid"                             as "paid"
           FROM "Lezione"
           WHERE ("libretto" = 'PRESENTE' OR "libretto" = 'ASSENTE_NON_GIUSTIFICATO')
-            AND "orarioDiFine" < DATE(CAST(${new Date().toJSON()}))
-            AND "orarioDiFine" BETWEEN (DATE(CAST(${start.toJSON()}))) AND (DATE(CAST(${end.toJSON()})))
-          GROUP BY "Lezione"."docenteId", "Lezione"."paid"
+            AND "orarioDiFine" < ${new Date().toJSON()}::timestamp
+            AND "orarioDiFine" BETWEEN ${start.toJSON()}::timestamp AND ${end.toJSON()}::timestamp
+          GROUP BY "Lezione"."docenteId", "Lezione"."paid";
         `
       )
         .map((entry) => {
