@@ -21,7 +21,7 @@ const getAlunno = endpoint(
           minutes: unknown;
         }[]
       >`
-        SELECT SUM(TIMESTAMPDIFF(MINUTE, "orarioDiInizio", "orarioDiFine")) as "minutes"
+        SELECT SUM(EXTRACT(EPOCH FROM "orarioDiFine"-"orarioDiInizio")) as minutes
         FROM "Lezione" join "_alunnotolezione" on ("Lezione"."id" = "_alunnotolezione"."B")
         WHERE "docenteId" = ${req.session.user!.id}
           AND "A" = ${req.body.id}
@@ -36,7 +36,7 @@ const getAlunno = endpoint(
           minutes: unknown;
         }[]
       >`
-        SELECT SUM(TIMESTAMPDIFF(MINUTE, "orarioDiInizio", "orarioDiFine")) as "minutes"
+        SELECT SUM(EXTRACT(EPOCH FROM "orarioDiFine"-"orarioDiInizio")) as minutes
         FROM "Lezione" join "_alunnotolezione" on ("Lezione"."id" = "_alunnotolezione"."B")
         WHERE "docenteId" = ${req.session.user!.id}
           AND "A" = ${req.body.id}
