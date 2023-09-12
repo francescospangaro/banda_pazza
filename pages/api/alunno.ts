@@ -26,7 +26,7 @@ const getAlunno = endpoint(
         WHERE "docenteId" = ${req.session.user!.id}
           AND "A" = ${req.body.id}
           AND "recuperoId" IS NULL
-          AND "orarioDiFine" BETWEEN (DATE(CAST(${startYear.toJSON()}))) AND (DATE(CAST(${endYear.toJSON()})))
+          AND "orarioDiFine" BETWEEN ${startYear.toJSON()}::timestamp AND ${endYear.toJSON()}::timestamp
     `
     )[0]?.minutes ?? 0);
 
@@ -41,7 +41,7 @@ const getAlunno = endpoint(
         WHERE "docenteId" = ${req.session.user!.id}
           AND "A" = ${req.body.id}
           AND ("libretto" = 'PRESENTE' OR "libretto" = 'ASSENTE_NON_GIUSTIFICATO')
-          AND "orarioDiFine" BETWEEN (DATE(CAST(${startYear.toJSON()}))) AND (DATE(CAST(${endYear.toJSON()})))
+          AND "orarioDiFine" BETWEEN ${startYear.toJSON()}::timestamp AND ${endYear.toJSON()}::timestamp
     `
     )[0]?.minutes ?? 0);
 
