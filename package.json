@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "dotenv -e .env.local -- npx prisma migrate dev && next dev",
+    "dev": "npx dotenv -e .env.local -- npx prisma migrate dev && next dev",
     "build": "prisma migrate deploy && next build",
     "start": "next start",
     "lint": "next lint"
