@@ -21,12 +21,12 @@ const getAlunno = endpoint(
           minutes: unknown;
         }[]
       >`
-        SELECT SUM(TIMESTAMPDIFF(MINUTE, orarioDiInizio, orarioDiFine)) as minutes
-        FROM Lezione join _alunnotolezione on (Lezione.id = _alunnotolezione.B)
-        WHERE docenteId = ${req.session.user!.id}
-          AND A = ${req.body.id}
-          AND recuperoId IS NULL
-          AND orarioDiFine BETWEEN (CAST(${startYear.toJSON()} as DATETIME)) AND (CAST(${endYear.toJSON()} as DATETIME))
+        SELECT SUM(TIMESTAMPDIFF(MINUTE, "orarioDiInizio", "orarioDiFine")) as "minutes"
+        FROM "Lezione" join "_alunnotolezione" on ("Lezione"."id" = "_alunnotolezione"."B")
+        WHERE "docenteId" = ${req.session.user!.id}
+          AND "A" = ${req.body.id}
+          AND "recuperoId" IS NULL
+          AND "orarioDiFine" BETWEEN (CAST(${startYear.toJSON()} as DATETIME)) AND (CAST(${endYear.toJSON()} as DATETIME))
     `
     )[0]?.minutes ?? 0);
 
@@ -36,12 +36,12 @@ const getAlunno = endpoint(
           minutes: unknown;
         }[]
       >`
-        SELECT SUM(TIMESTAMPDIFF(MINUTE, orarioDiInizio, orarioDiFine)) as minutes
-        FROM Lezione join _alunnotolezione on (Lezione.id = _alunnotolezione.B)
-        WHERE docenteId = ${req.session.user!.id}
-          AND A = ${req.body.id}
-          AND (libretto = 'PRESENTE' OR libretto = 'ASSENTE_NON_GIUSTIFICATO')
-          AND orarioDiFine BETWEEN (CAST(${startYear.toJSON()} as DATETIME)) AND (CAST(${endYear.toJSON()} as DATETIME))
+        SELECT SUM(TIMESTAMPDIFF(MINUTE, "orarioDiInizio", "orarioDiFine")) as "minutes"
+        FROM "Lezione" join "_alunnotolezione" on ("Lezione"."id" = "_alunnotolezione"."B")
+        WHERE "docenteId" = ${req.session.user!.id}
+          AND "A" = ${req.body.id}
+          AND ("libretto" = 'PRESENTE' OR "libretto" = 'ASSENTE_NON_GIUSTIFICATO')
+          AND "orarioDiFine" BETWEEN (CAST(${startYear.toJSON()} as DATETIME)) AND (CAST(${endYear.toJSON()} as DATETIME))
     `
     )[0]?.minutes ?? 0);
 
