@@ -17,4 +17,4 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 Following the advice of Next.js' creators, we deployed the project using the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme), created by the  
 creators of Next.js
 
-After deployment, we used a different Name Server for CNaming the URL to [registro.bandalurago.it](registro.bandalurago.it)  
+After deployment, we used a different Name Server for CNaming the URL to [registro.bandalurago.it](https://registro.bandalurago.it)  
