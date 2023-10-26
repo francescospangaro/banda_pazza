@@ -22,7 +22,7 @@ const getAlunno = endpoint(
         }[]
       >`
         SELECT SUM(EXTRACT(EPOCH FROM "orarioDiFine"-"orarioDiInizio")/60) as "minutes"
-        FROM "Lezione" join "_alunnotolezione" on ("Lezione"."id" = "_alunnotolezione"."B")
+        FROM "Lezione" join "_AlunnoToLezione" on ("Lezione"."id" = "_AlunnoToLezione"."B")
         WHERE "docenteId" = ${req.session.user!.id}
           AND "A" = ${req.body.id}
           AND "recuperoId" IS NULL
@@ -37,7 +37,7 @@ const getAlunno = endpoint(
         }[]
       >`
         SELECT SUM(EXTRACT(EPOCH FROM "orarioDiFine"-"orarioDiInizio")/60) as "minutes"
-        FROM "Lezione" join "_alunnotolezione" on ("Lezione"."id" = "_alunnotolezione"."B")
+        FROM "Lezione" join "_AlunnoToLezione" on ("Lezione"."id" = "_AlunnoToLezione"."B")
         WHERE "docenteId" = ${req.session.user!.id}
           AND "A" = ${req.body.id}
           AND ("libretto" = 'PRESENTE' OR "libretto" = 'ASSENTE_NON_GIUSTIFICATO')
